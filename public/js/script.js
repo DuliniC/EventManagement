@@ -75,6 +75,55 @@ document.addEventListener("DOMContentLoaded", function () {
     eventLocation = {};
   });
 
+  const scrollContainer = document.getElementById('scroll-container');
+  let isDragging = false;
+  let startX;
+  let scrollLeft;
+
+  scrollContainer.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.pageX - scrollContainer.offsetLeft;
+      scrollLeft = scrollContainer.scrollLeft;
+      scrollContainer.style.cursor = 'grabbing';
+  });
+
+  scrollContainer.addEventListener('mouseleave', () => {
+      isDragging = false;
+      scrollContainer.style.cursor = 'grab';
+  });
+
+  scrollContainer.addEventListener('mouseup', () => {
+      isDragging = false;
+      scrollContainer.style.cursor = 'grab';
+  });
+
+  scrollContainer.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - scrollContainer.offsetLeft;
+      const walk = (x - startX) * 2; // Adjust scroll speed
+      scrollContainer.scrollLeft = scrollLeft - walk;
+  });
+
+  scrollContainer.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      startX = e.touches[0].pageX - scrollContainer.offsetLeft;
+      scrollLeft = scrollContainer.scrollLeft;
+      scrollContainer.style.cursor = 'grabbing';
+  });
+
+  scrollContainer.addEventListener('touchend', () => {
+      isDragging = false;
+      scrollContainer.style.cursor = 'grab';
+  });
+
+  scrollContainer.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const x = e.touches[0].pageX - scrollContainer.offsetLeft;
+      const walk = (x - startX) * 2; // Adjust scroll speed
+      scrollContainer.scrollLeft = scrollLeft - walk;
+  });
+
   //Event Banner Image Preview
   banner.addEventListener("change", function () {
     const file = banner.files[0];
@@ -143,109 +192,180 @@ async function fetchCategories() {
     await fetch("/categories")
       .then((response) => response.json())
       .then((categories) => {
-        const categoryList = document.getElementById("categoryList");
-        categoryList.innerHTML = "";
-
-        const table = document.createElement("table");
-        const tbody = document.createElement("tbody");
-
-        populateSelect(categories);
-
-        categories.forEach((category) => {
-          const tr = document.createElement("tr");
-          tr.id = `category-row-${category._id}`;
-
-          tr.innerHTML = `
-            <td id="category-name-${category._id}">${category.name}</td>
-            <td>
-                <button class="btn-small btn-floating light-blue accent-3" id="editBtn" onclick="updateCategory('${category._id}')">
-                  <i class="material-icons">edit</i>
-                </button>
-            </td>
-            <td>
-                <button class="btn-small red btn-floating" id="deleteBtn" onclick="deleteCategory('${category._id}')">
-                  <i class="material-icons">delete</i>
-                </button>
-            </td>
-          `;
-
-          tbody.appendChild(tr);
-        });
-
-        table.appendChild(tbody);
-        categoryList.appendChild(table);
+        showCategories(categories);
+        showCategoryFilters(categories);
       });
-  } catch {
-    console.error("Failed to fetch categories:", error);
+  } catch (err) {
+    console.log("Failed to fetch categories:", err);
   }
 }
 
-//GET Events
+function showCategories(categories){
+  const categoryList = document.getElementById("categoryList");
+  categoryList.innerHTML = "";
+
+  const table = document.createElement("table");
+  const tbody = document.createElement("tbody");
+
+  populateSelect(categories);
+
+  categories.forEach((category) => {
+    const tr = document.createElement("tr");
+    tr.id = `category-row-${category._id}`;
+
+    tr.innerHTML = `
+      <td id="category-name-${category._id}">${category.name}</td>
+      <td>
+          <button class="btn-small btn-floating light-blue accent-3" id="editBtn" onclick="updateCategory('${category._id}')">
+            <i class="material-icons">edit</i>
+          </button>
+      </td>
+      <td>
+          <button class="btn-small red btn-floating" id="deleteBtn" onclick="deleteCategory('${category._id}')">
+            <i class="material-icons">delete</i>
+          </button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  categoryList.appendChild(table);
+}
+
+function showCategoryFilters(categories){
+  const cardList = document.getElementById('scroll-container');
+  cardList.innerHTML = '';
+
+  // Create and append the "All" category button
+  const allCard = document.createElement("div");
+  allCard.classList.add("option-card", "center-align", "white", "z-depth-1", "active"); // Make "All" active by default
+
+  allCard.innerHTML = `<p>All</p>`;
+
+  // Add event listener for the "All" category
+  allCard.addEventListener("click", function() {
+    document.querySelectorAll('.option-card').forEach(card => {
+      card.classList.remove('active');
+    });
+    allCard.classList.add('active');
+    getEvents();
+  });
+
+  cardList.appendChild(allCard);
+
+  categories.forEach((category) => {
+    const card = document.createElement("div");
+    card.classList.add("option-card", "center-align", "white", "z-depth-1");
+    card.innerHTML = `
+    <p>${category.name}</p>`;
+
+    card.addEventListener("click", function() {
+      document.querySelectorAll('.option-card').forEach(card => {
+        card.classList.remove('active');
+      });
+
+      card.classList.add('active');
+      getEventsByCategory(category._id);
+    });
+    cardList.appendChild(card);
+  })
+}
+
+//GET All Events
 async function getEvents() {
+  showSpinner();
   try {
     await fetch("/events")
       .then((response) => response.json())
       .then((events) => {
-        const cardContainer = document.getElementById("event-container");
-
-        events.forEach((event) => {
-          const card = document.createElement("div");
-          card.classList.add("card");
-
-          card.innerHTML = `
-            <div class="card-image">
-              <img src="data:image/png;base64,${
-                event.banner
-              }" onerror="this.onerror=null; this.src='./img/img-noload.jpg';" alt="Event Image">
-              <span class="card-title">
-                ${new Date(event.date).toDateString()} <br/> ${
-            event.timeStart
-          } - ${event.timeEnd}
-              </span>
-            </div>
-            <div class="card-content">
-              <span class="card-title">${event.name}</span>
-              <p>${event.details}</p>
-            </div>
-            <div class="card-action">
-              <div class="row">
-                <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
-                <div class="col s5">${event.location?.address}</div>
-                <div class="col s6">
-                  <button class="waves-light btn" id="rsvp-btn-${event._id}" 
-                      onclick="updateRSVP('${event._id}',${event.attendees})">RSVP</button>
-                  <span id="attendees-count-${event._id}">${
-            event.attendees
-          } Going</span>
-                </div>
-              </div>
-          </div>
-        `;
-          cardContainer.appendChild(card);
-
-          var marker = new google.maps.Marker({
-            position: { lat: event.location.latitude, lng: event.location.longitude },
-            map: map,
-            title: event.address
-          });
-
-          var infoWindow = new google.maps.InfoWindow({
-            content: `<div><strong>${event.name}</strong><br>
-            ${new Date(event.date).toDateString()}<br>
-            ${event.timeStart} - ${event.timeEnd}<br>
-            ${event.location.address}</div>`
-          });
-
-          marker.addListener('click', function() {
-            infoWindow.open(map, marker);
-          });
-        });
+        setEventCardContainer(events)
       });
-
-
   } catch (e) {
     console.log(e);
   }
+}
+
+async function getEventsByCategory(category){
+  try{
+    showSpinner();
+    await fetch(`/events/category/${category}`)
+      .then((response) => response.json())
+      .then((events) => {
+        setEventCardContainer(events)
+      });
+  } catch(e){
+    console.log(e);
+  }
+}
+
+function setEventCardContainer(events){
+  const cardContainer = document.getElementById("event-container");
+  cardContainer.innerHTML = '';
+
+    if (events.length === 0) {
+      const noDataMessage = document.createElement("div");
+      noDataMessage.classList.add("no-data");
+      noDataMessage.textContent = "No Events available.";
+      cardContainer.appendChild(noDataMessage);
+      initMap();
+      hideSpinner();
+      return;
+    }
+    events.forEach((event) => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+
+      card.innerHTML = `
+        <div class="card-image">
+          <img src="data:image/png;base64,${
+            event.banner
+          }" onerror="this.onerror=null; this.src='./img/img-noload.jpg';" alt="Event Image">
+          <span class="card-title">
+            ${new Date(event.date).toDateString()} <br/> ${
+        event.timeStart
+      } - ${event.timeEnd}
+          </span>
+        </div>
+        <div class="card-content">
+          <span class="card-title">${event.name}</span>
+          <p>${event.details}</p>
+        </div>
+        <div class="card-action">
+          <div class="row">
+            <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
+            <div class="col s5">${event.location?.address}</div>
+            <div class="col s6">
+              <button class="waves-light btn" id="rsvp-btn-${event._id}" 
+                  onclick="updateRSVP('${event._id}',${event.attendees})">RSVP</button>
+              <span id="attendees-count-${event._id}">${
+        event.attendees
+      } Going</span>
+            </div>
+          </div>
+      </div>
+    `;
+      cardContainer.appendChild(card);
+      hideSpinner();
+
+      var marker = new google.maps.Marker({
+        position: { lat: event.location.latitude, lng: event.location.longitude },
+        map: map,
+        title: event.address
+      });
+
+      var infoWindow = new google.maps.InfoWindow({
+        content: `<div><strong>${event.name}</strong><br>
+        ${new Date(event.date).toDateString()}<br>
+        ${event.timeStart} - ${event.timeEnd}<br>
+        ${event.location.address}</div>`
+      });
+
+      marker.addListener('click', function() {
+        infoWindow.open(map, marker);
+      });
+    });
 }
 
 function populateSelect(data) {
@@ -359,18 +479,19 @@ async function initMapPlace(){
         return;
     }   
 
-    var eventLocation = {
-      "address": place.formatted_address,
-      "latitude":place.geometry.location.lat(),
-      "longitude":place.geometry.location.lng()
-    }
-
     location.setAttribute('latitude',place.geometry.location.lat());
     location.setAttribute('longitude',place.geometry.location.lng());
   });
 
 }
 
+function showSpinner() {
+  document.getElementById('spinner').style.display = 'block';
+}
+
+function hideSpinner() {
+  document.getElementById('spinner').style.display = 'none';
+}
 
 let map;
 

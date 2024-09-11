@@ -29,7 +29,6 @@ router.get("/events/category/:category", async (req, res) =>{
   try{
     const filteredEvents = await Event.find({categories:{$in: [param]}});
     res.json(filteredEvents);
-
   }catch (err){
     res.status(500).send(err);
   }

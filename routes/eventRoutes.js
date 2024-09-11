@@ -79,6 +79,7 @@ router.delete("/events/:id", async (req, res) => {
   }
 });
 
+// UPDATE RSVP
 router.patch("/events/rsvp/:id", async (req, res) => {
   const { id } = req.params;
   try{
@@ -100,6 +101,5 @@ router.patch("/events/rsvp/:id", async (req, res) => {
 
 })
 
-// UPDATE RSVP
 
 module.exports = router;

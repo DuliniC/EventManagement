@@ -1,5 +1,6 @@
 const express = require("express");
 const Event = require("../models/Event");
+
 const router = express.Router();
 
 // Get all events (GET)
@@ -18,6 +19,18 @@ router.get("/events/:id", async (req, res) => {
     const event = await Event.findById(req.params.id);
     res.json(event); // Send as JSON to frontend
   } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+//Get by Category
+router.get("/events/category/:category", async (req, res) =>{
+  var param = req.params.category;
+  try{
+    const filteredEvents = await Event.find({categories:{$in: [param]}});
+    res.json(filteredEvents);
+
+  }catch (err){
     res.status(500).send(err);
   }
 });

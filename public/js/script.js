@@ -300,72 +300,81 @@ async function getEventsByCategory(category){
   }
 }
 
+let markers = [];
+
 function setEventCardContainer(events){
   const cardContainer = document.getElementById("event-container");
   cardContainer.innerHTML = '';
+  if (events.length === 0) {
+    const noDataMessage = document.createElement("div");
+    noDataMessage.classList.add("no-data");
+    noDataMessage.textContent = "No Events available.";
+    cardContainer.appendChild(noDataMessage);
+    initMap();
+    hideSpinner();
+    return;
+  }
+  markers.forEach(marker => {
+    marker.setMap(null); // Removes the marker from the map
+  });
+  markers = [];
 
-    if (events.length === 0) {
-      const noDataMessage = document.createElement("div");
-      noDataMessage.classList.add("no-data");
-      noDataMessage.textContent = "No Events available.";
-      cardContainer.appendChild(noDataMessage);
-      initMap();
-      hideSpinner();
-      return;
-    }
-    events.forEach((event) => {
-      const card = document.createElement("div");
-      card.classList.add("card");
+  events.forEach((event) => {
+    const card = document.createElement("div");
+    card.classList.add("card");
 
-      card.innerHTML = `
-        <div class="card-image">
-          <img src="data:image/png;base64,${
-            event.banner
-          }" onerror="this.onerror=null; this.src='./img/img-noload.jpg';" alt="Event Image">
-          <span class="card-title">
-            ${new Date(event.date).toDateString()} <br/> ${
-        event.timeStart
-      } - ${event.timeEnd}
-          </span>
-        </div>
-        <div class="card-content">
-          <span class="card-title">${event.name}</span>
-          <p>${event.details}</p>
-        </div>
-        <div class="card-action">
-          <div class="row">
-            <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
-            <div class="col s5">${event.location?.address}</div>
-            <div class="col s6">
-              <button class="waves-light btn" id="rsvp-btn-${event._id}" 
-                  onclick="updateRSVP('${event._id}',${event.attendees})">RSVP</button>
-              <span id="attendees-count-${event._id}">${
-        event.attendees
-      } Going</span>
-            </div>
-          </div>
+    card.innerHTML = `
+      <div class="card-image">
+        <img src="data:image/png;base64,${
+          event.banner
+        }" onerror="this.onerror=null; this.src='./img/img-noload.jpg';" alt="Event Image">
+        <span class="card-title">
+          ${new Date(event.date).toDateString()} <br/> ${
+      event.timeStart
+    } - ${event.timeEnd}
+        </span>
       </div>
+      <div class="card-content">
+        <span class="card-title">${event.name}</span>
+        <p>${event.details}</p>
+      </div>
+      <div class="card-action">
+        <div class="row">
+          <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
+          <div class="col s5">${event.location?.address}</div>
+          <div class="col s6">
+            <button class="waves-light btn" id="rsvp-btn-${event._id}" 
+                onclick="updateRSVP('${event._id}',${event.attendees})">RSVP</button>
+            <span id="attendees-count-${event._id}">${
+      event.attendees
+    } Going</span>
+          </div>
+        </div>
+    </div>
     `;
-      cardContainer.appendChild(card);
-      hideSpinner();
+    cardContainer.appendChild(card);
 
-      var marker = new google.maps.Marker({
-        position: { lat: event.location.latitude, lng: event.location.longitude },
-        map: map,
-        title: event.address
-      });
-
-      var infoWindow = new google.maps.InfoWindow({
-        content: `<div><strong>${event.name}</strong><br>
-        ${new Date(event.date).toDateString()}<br>
-        ${event.timeStart} - ${event.timeEnd}<br>
-        ${event.location.address}</div>`
-      });
-
-      marker.addListener('click', function() {
-        infoWindow.open(map, marker);
-      });
+    var marker = new google.maps.Marker({
+      position: { lat: event.location.latitude, lng: event.location.longitude },
+      map: map,
+      title: event.address
     });
+
+    markers.push(marker);
+
+    var infoWindow = new google.maps.InfoWindow({
+      content: `<div><strong>${event.name}</strong><br>
+      ${new Date(event.date).toDateString()}<br>
+      ${event.timeStart} - ${event.timeEnd}<br>
+      ${event.location.address}</div>`
+    });
+
+    marker.addListener('click', function() {
+      infoWindow.open(map, marker);
+    });
+
+    hideSpinner();
+  });
 }
 
 function populateSelect(data) {
@@ -462,6 +471,26 @@ function saveUpdateCategory(id){
   }
 }
 
+function showSpinner() {
+  document.getElementById('spinner').style.display = 'block';
+}
+
+function hideSpinner() {
+  document.getElementById('spinner').style.display = 'none';
+}
+
+let map;
+
+async function initMap() {
+  const { Map } = await google.maps.importLibrary("maps");
+  await google.maps.importLibrary("places");
+
+  map = new Map(document.getElementById("map"), {
+    center: { lat: -25.2744, lng: 133.7751 },
+    zoom: 4.5
+  });
+}
+
 async function initMapPlace(){
   //@ts-ignore
   await google.maps.importLibrary("places");
@@ -483,24 +512,4 @@ async function initMapPlace(){
     location.setAttribute('longitude',place.geometry.location.lng());
   });
 
-}
-
-function showSpinner() {
-  document.getElementById('spinner').style.display = 'block';
-}
-
-function hideSpinner() {
-  document.getElementById('spinner').style.display = 'none';
-}
-
-let map;
-
-async function initMap() {
-  const { Map } = await google.maps.importLibrary("maps");
-  await google.maps.importLibrary("places");
-
-  map = new Map(document.getElementById("map"), {
-    center: { lat: -25.2744, lng: 133.7751 },
-    zoom: 4.5
-  });
 }

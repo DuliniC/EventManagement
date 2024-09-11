@@ -22,16 +22,17 @@
             <a href="#" class="brand-logo black-text text-darken-2">Event Management</a>
         </div>
     </nav>
+
     <div class="btn-container">
-        <button class="add-event waves-effect waves-light btn light-blue accent-3 p-button" id="addEventBtn">Add
+        <button class="add-event btn light-blue accent-3 p-button btn-large" id="addEventBtn">Add
             Event</button>
-        <button class="add-category waves-effect waves-light btn cyan accent-3 p-button" id="addCategoryBtn">Add
+        <button class="add-category btn cyan accent-3 p-button btn-large" id="addCategoryBtn">Add
             Category</button>
     </div>
 
     <!-- Category Filter Section -->
     <div class="category-filters">
-        <h5>Filter by Categories</h5>
+        <h5><b>Filter by Categories</b></h5>
         <div id="scroll-container" class="options-container">
             
         </div>
@@ -44,7 +45,7 @@
     <div id="spinner" class="spinner"></div>
 
     <!-- Google Map -->
-    <h5>Event Locations</h5>
+    <h5><b>Event Locations</b></h5>
     <div id="map"></div>
 
     <!--Add Category Side Panel -->
@@ -130,6 +131,18 @@
         </form>
     </div>
 
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+          <h4 id="modal-title" class="modal-header">Event Details</h4>
+          <p id="modal-content" class="modal-body">Event description goes here...</p>
+        </div>
+        <div class="modal-footer">
+          <a href="#!" class="waves-effect waves-light blue btn">Update</a>
+          <a href="#!" class="waves-effect waves-light red btn">Delete</a>
+          <a href="#!" class="modal-close waves-effect waves-light btn">Back</a>
+        </div>
+    </div>
 
     </form>
     </div>

@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addEventBtn.style.display = "none";
     sidePanelE.classList.add("open");
     fetchCategories();
+    initMapPlace();
   });
 
   cancelForm.addEventListener("click", () => {
@@ -71,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
     eventAddForm.reset();
     imagePreview.src = "";
     bannerBase64String = "";
+    eventLocation = {};
   });
 
   //Event Banner Image Preview
@@ -93,12 +95,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //Submit Event Form
   eventAddForm.addEventListener("submit", function (event) {
-    event.preventDefault();
+    var location = document.getElementById('event-location');
 
+    event.preventDefault();
     const data = {
       "name": document.getElementById("event-name").value,
       "details": document.getElementById("details").value,
       "date": new Date(document.getElementById("date").value),
+      "location": {
+        "address": location.value,
+        "latitude":Number(location.getAttribute('latitude')),
+        "longitude":Number(location.getAttribute('longitude'))
+      },
       "timeStart": document.getElementById("timeStart").value,
       "timeEnd": document.getElementById("timeEnd").value,
       "categories": Array.from(
@@ -188,7 +196,7 @@ async function getEvents() {
             <div class="card-image">
               <img src="data:image/png;base64,${
                 event.banner
-              }" alt="Event Image">
+              }" onerror="this.onerror=null; this.src='./img/img-noload.jpg';" alt="Event Image">
               <span class="card-title">
                 ${new Date(event.date).toDateString()} <br/> ${
             event.timeStart
@@ -201,7 +209,8 @@ async function getEvents() {
             </div>
             <div class="card-action">
               <div class="row">
-                <div class="col s6">${event.name}</div>
+                <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
+                <div class="col s5">${event.location?.address}</div>
                 <div class="col s6">
                   <button class="waves-light btn" id="rsvp-btn-${event._id}" 
                       onclick="updateRSVP('${event._id}',${event.attendees})">RSVP</button>
@@ -213,8 +222,27 @@ async function getEvents() {
           </div>
         `;
           cardContainer.appendChild(card);
+
+          var marker = new google.maps.Marker({
+            position: { lat: event.location.latitude, lng: event.location.longitude },
+            map: map,
+            title: event.address
+          });
+
+          var infoWindow = new google.maps.InfoWindow({
+            content: `<div><strong>${event.name}</strong><br>
+            ${new Date(event.date).toDateString()}<br>
+            ${event.timeStart} - ${event.timeEnd}<br>
+            ${event.location.address}</div>`
+          });
+
+          marker.addListener('click', function() {
+            infoWindow.open(map, marker);
+          });
         });
       });
+
+
   } catch (e) {
     console.log(e);
   }
@@ -314,13 +342,44 @@ function saveUpdateCategory(id){
   }
 }
 
+async function initMapPlace(){
+  //@ts-ignore
+  await google.maps.importLibrary("places");
+  const location = document.getElementById("event-location");
+  //@ts-ignore
+  placeAutocomplete = new google.maps.places.Autocomplete(location,{
+    componentRestrictions: {country: 'au'},
+  });
+  
+  //@ts-ignore
+  placeAutocomplete.addListener('place_changed', function() {
+    var place = placeAutocomplete.getPlace();
+    if (!place.geometry || !place.geometry.location) {
+        console.log("No details available for input: '" + place.name + "'");
+        return;
+    }   
+
+    var eventLocation = {
+      "address": place.formatted_address,
+      "latitude":place.geometry.location.lat(),
+      "longitude":place.geometry.location.lng()
+    }
+
+    location.setAttribute('latitude',place.geometry.location.lat());
+    location.setAttribute('longitude',place.geometry.location.lng());
+  });
+
+}
+
+
 let map;
 
 async function initMap() {
   const { Map } = await google.maps.importLibrary("maps");
+  await google.maps.importLibrary("places");
 
   map = new Map(document.getElementById("map"), {
-    center: { lat: -34.397, lng: 150.644 },
-    zoom: 8,
+    center: { lat: -25.2744, lng: 133.7751 },
+    zoom: 4.5
   });
 }

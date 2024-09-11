@@ -33,7 +33,8 @@ router.post("/events", async (req, res) => {
     organizerName,
     categories,
     organizerContact,
-    banner
+    banner,
+    location
   } = req.body;
 
   try {
@@ -46,7 +47,8 @@ router.post("/events", async (req, res) => {
       categories,
       organizerName,
       organizerContact,
-      banner
+      banner,
+      location
     });
 
     await event.save();

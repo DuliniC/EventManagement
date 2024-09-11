@@ -103,4 +103,8 @@ body {
 #map {
     height: 500px;
     margin: 5px;
-  }
+}
+
+i.icon-location {
+    color: rgb(65, 225, 30);
+}

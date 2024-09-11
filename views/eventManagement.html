@@ -42,12 +42,6 @@
     <div class="card-container" id="event-container">
     </div>
 
-    <div>
-        <input id="user_input_autocomplete_address" name="user_input_autocomplete_address"
-                         class="form-control" placeholder="Start typing your address...">
-        <label for="event-location">Location</label>
-    </div>
-
     <!-- Google Map -->
     <h5>Event Locations</h5>
     <div id="map"></div>
@@ -101,7 +95,7 @@
                 <label for="timeEnd">End Time</label>
             </div>
             <div class="input-field">
-                <input id="event-location" type="text" class="autocomplete">
+                <input id="event-location" type="text" required>
                 <label for="event-location">Location</label>
             </div>
             <div class="input-field">
@@ -141,37 +135,6 @@
     <script>(g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
             ({ key: "AIzaSyDV1mLpG7FgmDa9vyXga5l7uJGfM0Sz-Vc", libraries: "places", v: "weekly" });</script>
 
-    <!-- <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDV1mLpG7FgmDa9vyXga5l7uJGfM0Sz-Vc&callback=initMap&v=weekly&region=AU"></script> -->
-    <script>
-        // Ensure the callback function is defined in the global scope
-        function initAutocomplete() {
-            const element = document.getElementById('event-location');
-            var autocomplete = new google.maps.places.Autocomplete(element, { types: ['geocode'] });
-            google.maps.event.addListener(autocomplete, 'place_changed', onPlaceChanged);
-
-        }
-
-        function onPlaceChanged() {
-            var place = this.getPlace();
-
-            // console.log(place);  // Uncomment this line to view the full object returned by Google API.
-
-            for (var i in place.address_components) {
-                var component = place.address_components[i];
-                for (var j in component.types) {  // Some types are ["country", "political"]
-                    var type_element = document.getElementById(component.types[j]);
-                    if (type_element) {
-                        type_element.value = component.long_name;
-                    }
-                }
-            }
-        }
-
-        window.onload = function () {
-            initAutocomplete();
-        };
-    </script>
 </body>
 
 </html>

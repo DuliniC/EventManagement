@@ -64,10 +64,9 @@ router.post("/events", async (req, res) => {
     });
 
     await event.save();
-    res.redirect("/");
+    res.status(201).json(event);
   } catch (err) {
     res.status(500).send(err.message);
-    console.log(err.message);
   }
 });
 
@@ -84,7 +83,7 @@ router.put("/events/:id", async (req, res) => {
     organizerContact,
     banner,
     location,
-    attendees
+    attendees,
   } = req.body;
   try {
     await Event.findByIdAndUpdate(req.params.id, {
@@ -98,9 +97,9 @@ router.put("/events/:id", async (req, res) => {
       organizerContact,
       banner,
       location,
-      attendees
+      attendees,
     });
-    res.redirect("/");
+    res.status(200).json({message: "Update Successfully"});
   } catch (err) {
     res.status(500).send(err);
   }
@@ -110,7 +109,7 @@ router.put("/events/:id", async (req, res) => {
 router.delete("/events/:id", async (req, res) => {
   try {
     await Event.findByIdAndDelete(req.params.id);
-    res.redirect("/");
+    res.status(200).json({ message: "Delete Event Successfully" });
   } catch (err) {
     res.status(500).send(err);
   }

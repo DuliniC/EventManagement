@@ -172,17 +172,26 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("save-update-btn")
     .addEventListener("click", function () {
+      var location = document.getElementById("edit-event-location");
+
+      // prettier-ignore
       const updatedEvent = {
-        name: document.getElementById("edit-event-name").value,
-        date: document.getElementById("edit-date").value,
-        timeStart: document.getElementById("edit-timeStart").value,
-        timeEnd: document.getElementById("edit-timeEnd").value,
-        location: {
-          address: document.getElementById("edit-location").value,
-          latitude: Number(location.getAttribute("latitude")),
-          longitude: Number(location.getAttribute("longitude")),
+        "name": document.getElementById("edit-event-name").value,
+        "details": document.getElementById("edit-details").value,
+        "date": new Date(document.getElementById("edit-date").value),
+        "location": {
+          "address": location.value,
+          "latitude": Number(location.getAttribute("latitude")),
+          "longitude": Number(location.getAttribute("longitude")),  
         },
-        details: document.getElementById("edit-details").value,
+        "timeStart": document.getElementById("edit-timeStart").value,
+        "timeEnd": document.getElementById("edit-timeEnd").value,
+        "categories": Array.from(
+          document.getElementById("edit-selectCategory").selectedOptions
+        ).map((option) => option.value),
+        "organizerName": document.getElementById("edit-organizerName").value,
+        "organizerContact": document.getElementById("edit-organizerContact").value,
+        "banner": updatedBannerString,
       };
 
       updateEvent(selectedEventId, updatedEvent);
@@ -228,8 +237,11 @@ document.addEventListener("DOMContentLoaded", function () {
       eventAddForm.reset();
       imagePreview.src = "";
       sidePanelE.classList.remove("open");
-      window.location.reload();
+
       getEvents();
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
     } catch (err) {
       M.toast({ html: "Event Adding Failed" });
     }
@@ -249,7 +261,7 @@ let currentInfoWindow = null;
 let selectedEventId = null;
 let selectedEventAttendess = 0;
 let map;
-
+let updatedBannerString = "";
 // GET categories
 async function getCategories() {
   try {
@@ -516,18 +528,43 @@ function viewEvent(event) {
   document.getElementById("edit-organizerName").value = event.organizerName;
   document.getElementById("edit-organizerContact").value =
     event.organizerContact;
-  document.getElementById("edit-event-location").value = event.location.address;
-  document.getElementById("edit-selectCategory").value = selectedCategories;
+  var location = document.getElementById("edit-event-location");
+  location.value = event.location.address;
+  location.setAttribute("latitude", event.location.latitude);
+  location.setAttribute("longitude", event.location.longitude);
 
-  /* Array.from(selectElement.options).forEach(option => {
-    // Check if the option's value is in the categories array
+  var selectElement = document.getElementById("edit-selectCategory");
+  selectElement.value = event.categories;
+
+  Array.from(selectElement.options).forEach((option) => {
     if (selectedCategories.includes(option.value)) {
-      option.selected = true; // Set it as selected
+      option.selected = true;
     } else {
-      option.selected = false; // Deselect if not in the array
+      option.selected = false;
     }
-  }); */
-  //img
+  });
+
+  var editPreview = document.getElementById("edit-imagePreview");
+
+  var editBanner = document.getElementById("edit-event-banner");
+  editPreview.src = `data:image/png;base64,${event.banner}`;
+  updatedBannerString = event.banner;
+
+  editBanner.addEventListener("change", function () {
+    const file = editBanner.files[0];
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const imageDataUrl = e.target.result;
+      updatedBannerString = reader.result
+        .replace("data:", "")
+        .replace(/^.+,/, "");
+      editPreview.src = imageDataUrl;
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 
 //Delete Event
@@ -539,11 +576,15 @@ function deleteEvent(eventId) {
       .then((response) => {
         if (response.ok) {
           M.toast({ html: "Event deleted successfully" });
+          setTimeout(() => {
+            location.reload();
+          }, 2000);
           location.reload();
         } else {
-          const modalInstance = M.Modal.getInstance(modal);
-          modalInstance.close();
           M.toast({ html: "Failed to delete the event" });
+          setTimeout(() => {
+            location.reload();
+          }, 2000);
         }
       })
       .catch((error) => {
@@ -554,53 +595,29 @@ function deleteEvent(eventId) {
 
 //Update Event API Call
 function updateEvent(eventId, updatedEvent) {
-  fetch(`/api/events/${eventId}`, {
+  fetch(`/events/${eventId}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(updatedEvent),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        alert("Event updated successfully");
-        location.reload();
+    .then((response) => {
+      if (response.ok) {
+        M.toast({ html: "Event updated successfully" });
       } else {
-        alert("Failed to update event");
+        M.toast({ html: "Failed to update event" });
       }
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
     })
     .catch((error) => {
-      console.error("Error:", error);
+      console.log("Error:", error);
     });
 }
 
-// Populate Categories into Event add Form
-/* function populateSelect(data) {
-  var select = document.getElementById("selectCategory");
-
-  var instance = M.FormSelect.getInstance(select);
-  if (instance) {
-    instance.destroy();
-  }
-  select.innerHTML = `<option value="" disabled>--Select an option--</option>`;
-
-  data.forEach((item) => {
-    const option = document.createElement("option");
-    option.value = item._id;
-    option.textContent = item.name;
-    option.index;
-    select.appendChild(option);
-  });
-
-  M.FormSelect.init(select);
-
-  var dropdownItems = document.querySelectorAll(".select-dropdown li");
-  dropdownItems.forEach(function (item, index) {
-    item.setAttribute("tabindex", (index + 1).toString());
-  });
-} */
-
+// Populate Categories into Event Forms
 function populateSelect(data, select) {
   var instance = M.FormSelect.getInstance(select);
   if (instance) {

@@ -3,14 +3,15 @@ const path = require('path');
 const bodyParser = require('body-parser'); 
 
 const app = express();
-app.use(express.json());
 
 const connectDB = require('./db/db');
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json({ limit: '20mb' }));
+app.use(bodyParser.json({limit: '1mb'}));
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
+
 // Connect to DB
 connectDB();
 

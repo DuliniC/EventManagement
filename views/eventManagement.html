@@ -18,7 +18,7 @@
 
 <body>
     <nav>
-        <div class="nav-wrapper grey lighten-5">
+        <div class="nav-wrapper blue accent-4 nav">
             <a href="#" class="brand-logo black-text text-darken-2">Event Management</a>
         </div>
     </nav>
@@ -38,7 +38,6 @@
         </div>
     </div>
 
-
     <!--events-->
     <div class="card-container" id="event-container">
     </div>
@@ -56,7 +55,7 @@
         <form action="/categories" method="POST" id="categoryForm">
 
             <div class="input-field">
-                <input type="text" id="name" name="name">
+                <input type="text" id="name" name="name" required>
                 <label for="name">Category Name</label>
             </div>
 
@@ -109,7 +108,7 @@
                 <label for="organizerContact">Organizer's Contact Number</label>
             </div>
             <div class="input-field">
-                <select multiple id="selectCategory" class="materialSelect"></select>
+                <select multiple id="selectCategory" class="materialSelect" required></select>
                 <label>Categories</label>
             </div>
 
@@ -119,7 +118,7 @@
                 </div>
 
                 <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text">
+                    <input class="file-path validate" type="text" required>
                 </div>
                 <img id="imagePreview">
             </div>
@@ -131,7 +130,7 @@
         </form>
     </div>
 
-
+    <!--Event Detail Modal-->
     <div id="eventModal" class="modal">
         <!--Event View-->
         <div class="modal-content" id="event-details-view">
@@ -140,58 +139,60 @@
         </div>
 
         <!--Event Update View-->
-        <form id="edit-event-form" style="display: none;">
-            <h4>Update Event</h4>
-            <div class="input-field">
-                <input id="edit-event-name" type="text" required>
-                <label for="edit-event-name">Event Name</label>
-            </div>
-            <div class="input-field">
-                <textarea id="edit-details" class="materialize-textarea"></textarea>
-                <label for="edit-details">Event Details</label>
-            </div>
-            <div class="input-field">
-                <label for="edit-date">Date</label>
-                <input type="text" id="edit-date" class="datepicker" required>
+        <div class="container">
+            <form id="edit-event-form" style="display: none;">
+                <h4>Update Event</h4>
+                <br>
+                <div class="input-field">
+                    <input id="edit-event-name" type="text" placeholder="" required>
+                    <label for="edit-event-name">Event Name</label>
+                </div>
+                <div class="input-field">
+                    <textarea id="edit-details" class="materialize-textarea" placeholder=""></textarea>
+                    <label for="edit-details">Event Details</label>
+                </div>
+                <div class="input-field">
+                    <label for="edit-date">Date</label>
+                    <input type="text" id="edit-date" class="datepicker" placeholder="" required>
 
-            </div>
-            <div class="input-field">
-                <input type="text" id="edit-timeStart" class="timepicker" required>
-                <label for="edit-timeStart">Start Time</label>
-            </div>
-            <div class="input-field">
-                <input type="text" id="edit-timeEnd" class="timepicker" required>
-                <label for="edit-timeEnd">End Time</label>
-            </div>
-            <div class="input-field">
-                <input id="event-location" type="text" required>
-                <label for="event-location">Location</label>
-            </div>
-            <div class="input-field">
-                <input id="edit-organizerName" type="text" required>
-                <label for="edit-organizerName">Organizer's Name</label>
-            </div>
-            <div class="input-field">
-                <input id="edit-organizerContact" type="text" required>
-                <label for="edit-organizerContact">Organizer's Contact Number</label>
-            </div>
-            <div class="input-field">
-                <select multiple id="edit-selectCategory" class="materialSelect"></select>
-                <label>Categories</label>
-            </div>
-
-            <div class="file-field input-field">
-                <div class="waves-effect waves-light btn"><i class="material-icons left">arrow_upward</i>Upload
-                    <input type="file" accept="image/*" id="event-banner">
+                </div>
+                <div class="input-field">
+                    <input type="text" id="edit-timeStart" class="timepicker" placeholder="" required>
+                    <label for="edit-timeStart">Start Time</label>
+                </div>
+                <div class="input-field">
+                    <input type="text" id="edit-timeEnd" class="timepicker" placeholder="" required>
+                    <label for="edit-timeEnd">End Time</label>
+                </div>
+                <div class="input-field">
+                    <input disabled id="edit-event-location" type="text" placeholder="">
+                    <label for="edit-event-location">Location</label>
+                </div>
+                <div class="input-field">
+                    <input id="edit-organizerName" type="text" placeholder="" required>
+                    <label for="edit-organizerName">Organizer's Name</label>
+                </div>
+                <div class="input-field">
+                    <input id="edit-organizerContact" type="text" placeholder="" required>
+                    <label for="edit-organizerContact">Organizer's Contact Number</label>
+                </div>
+                <div class="input-field">
+                    <select multiple id="edit-selectCategory" class="materialSelect"></select>
+                    <label>Categories</label>
                 </div>
 
-                <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text">
-                </div>
-                <img id="edit-imagePreview">
-            </div>
-        </form>
+                <div class="file-field input-field">
+                    <div class="waves-effect waves-light btn"><i class="material-icons left">arrow_upward</i>Upload New
+                        <input type="file" accept="image/*" id="event-banner">
+                    </div>
 
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                    <img id="edit-imagePreview">
+                </div>
+            </form>
+        </div>
         <div class="modal-footer">
             <a href="#!" class="waves-effect waves-light blue btn" id="edit-event-btn">Update</a>
             <a href="" class="waves-effect waves-light red btn" id="delete-event-btn">Delete</a>

@@ -167,6 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("edit-event-btn").style.display = "none";
       document.getElementById("delete-event-btn").style.display = "none";
       document.getElementById("save-update-btn").style.display = "inline-block";
+      initMapPlaceUpdate();
     });
 
   document
@@ -241,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
       getEvents();
       setTimeout(() => {
         location.reload();
-      }, 2000);
+      }, 1000);
     } catch (err) {
       M.toast({ html: "Event Adding Failed" });
     }
@@ -578,13 +579,13 @@ function deleteEvent(eventId) {
           M.toast({ html: "Event deleted successfully" });
           setTimeout(() => {
             location.reload();
-          }, 2000);
+          }, 1000);
           location.reload();
         } else {
           M.toast({ html: "Failed to delete the event" });
           setTimeout(() => {
             location.reload();
-          }, 2000);
+          }, 1000);
         }
       })
       .catch((error) => {
@@ -610,7 +611,7 @@ function updateEvent(eventId, updatedEvent) {
       }
       setTimeout(() => {
         location.reload();
-      }, 2000);
+      }, 1000);
     })
     .catch((error) => {
       console.log("Error:", error);
@@ -750,6 +751,28 @@ async function initMapPlace() {
   //@ts-ignore
   await google.maps.importLibrary("places");
   const location = document.getElementById("event-location");
+  //@ts-ignore
+  placeAutocomplete = new google.maps.places.Autocomplete(location, {
+    componentRestrictions: { country: "au" },
+  });
+
+  //@ts-ignore
+  placeAutocomplete.addListener("place_changed", function () {
+    var place = placeAutocomplete.getPlace();
+    if (!place.geometry || !place.geometry.location) {
+      console.log("No details available for input: '" + place.name + "'");
+      return;
+    }
+
+    location.setAttribute("latitude", place.geometry.location.lat());
+    location.setAttribute("longitude", place.geometry.location.lng());
+  });
+}
+
+async function initMapPlaceUpdate() {
+  //@ts-ignore
+  await google.maps.importLibrary("places");
+  const location = document.getElementById("edit-event-location");
   //@ts-ignore
   placeAutocomplete = new google.maps.places.Autocomplete(location, {
     componentRestrictions: { country: "au" },

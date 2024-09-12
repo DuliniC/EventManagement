@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const closePanel = document.getElementById("closePanel");
   const closePanelE = document.getElementById("closePanelE");
   const eventAddForm = document.getElementById("eventForm");
+  const categoryForm = document.getElementById("categoryForm");
   const cancelForm = document.getElementById("cancel");
   const imagePreview = document.getElementById("imagePreview");
   const banner = document.getElementById("event-banner");
@@ -45,6 +46,8 @@ document.addEventListener("DOMContentLoaded", function () {
     sidePanelE.style.marginLeft = "0%";
     sidePanelE.style.display = "none";
     sidePanelE.classList.remove("open");
+
+    categoryForm.reset();
   });
 
   closePanelE.addEventListener("click", () => {
@@ -53,6 +56,11 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "inline-block";
     addEventBtn.style.display = "inline-block";
     sidePanelE.classList.remove("open");
+
+    eventAddForm.reset();
+    imagePreview.src = "";
+    bannerBase64String = "";
+    eventLocation = {};
   });
 
   addEventBtn.addEventListener("click", () => {
@@ -509,22 +517,24 @@ function viewEvent(event) {
 }
 
 function deleteEvent(eventId) {
-  fetch(`/events/${eventId}`, {
-    method: "DELETE",
-  })
-    .then((response) => {
-      if (response.ok) {
-        M.toast({ html: "Event deleted successfully" });
-        location.reload();
-      } else {
-        const modalInstance = M.Modal.getInstance(modal);
-        modalInstance.close();
-        M.toast({ html: "Failed to delete the event" });
-      }
+  if (confirm("Are you sure you want to delete this event?")) {
+    fetch(`/events/${eventId}`, {
+      method: "DELETE",
     })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      .then((response) => {
+        if (response.ok) {
+          M.toast({ html: "Event deleted successfully" });
+          location.reload();
+        } else {
+          const modalInstance = M.Modal.getInstance(modal);
+          modalInstance.close();
+          M.toast({ html: "Failed to delete the event" });
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 }
 
 function updateEvent(eventId, updatedEvent) {
@@ -590,18 +600,20 @@ function updateRSVP(id) {
 }
 
 async function deleteCategory(id) {
-  try {
-    await fetch(`/categories/${id}`, {
-      method: "DELETE",
-    })
-    fetchCategories();
-    M.toast({ html: "Category Deleted" });
-    const row = document.getElementById(`category-row-${id}`);
-    if (row) {
-      row.remove();
+  if (confirm("Are you sure you want to delete this item?")) {
+    try {
+      await fetch(`/categories/${id}`, {
+        method: "DELETE",
+      });
+      fetchCategories();
+      M.toast({ html: "Category Deleted" });
+      const row = document.getElementById(`category-row-${id}`);
+      if (row) {
+        row.remove();
+      }
+    } catch (err) {
+      console.log();
     }
-  } catch (err) {
-    console.log();
   }
 }
 

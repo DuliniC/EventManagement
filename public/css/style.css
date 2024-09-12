@@ -132,7 +132,7 @@ i.icon-view {
     background-color: #e0f7fa;
 }
 
-.active {
+.activeCard {
     background-color: #a9cfef !important;
 }
 
@@ -167,8 +167,8 @@ i.icon-view {
     border: 16px solid #f3f3f3;
     border-top: 16px solid #3498db;
     border-radius: 50%;
-    width: 120px;
-    height: 120px;
+    width: 80px;
+    height: 80px;
     animation: spin 2s linear infinite;
 }
 
@@ -180,7 +180,7 @@ i.icon-view {
 
 /* Modal Content Styling */
 .modal-content {
-    padding: 20px;
+    padding: 10px;
 }
 
 .modal-header {
@@ -212,9 +212,10 @@ i.icon-view {
     margin-right: 20px;
 }
 
-h5{
-    font-family:"Inter", sans-serif;
+h5 {
+    font-family: "Inter", sans-serif;
 }
+
 /* Responsive Design */
 @media only screen and (max-width: 600px) {
     .modal-header {
@@ -224,4 +225,65 @@ h5{
     .modal-info {
         font-size: 14px;
     }
+}
+
+#eventModal {
+    overflow-y: auto;
+    min-height: 50%;
+    max-height: 80%;
+    padding: auto;
+}
+
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Popup Box */
+.popup {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 300px;
+}
+
+/* Buttons inside Popup */
+.confirm-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.cancel-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm-btn:hover {
+    background-color: #c0392b;
+}
+
+.cancel-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Hide Popup */
+.hidden {
+    display: none;
 }

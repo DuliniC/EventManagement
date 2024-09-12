@@ -1,5 +1,6 @@
 const express = require("express");
 const Event = require("../models/Event");
+
 const router = express.Router();
 
 // Get all events (GET)
@@ -22,6 +23,17 @@ router.get("/events/:id", async (req, res) => {
   }
 });
 
+//Get by Category
+router.get("/events/category/:category", async (req, res) => {
+  var param = req.params.category;
+  try {
+    const filteredEvents = await Event.find({ categories: { $in: [param] } });
+    res.json(filteredEvents);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
 // Create a new event (CREATE)
 router.post("/events", async (req, res) => {
   const {
@@ -34,7 +46,7 @@ router.post("/events", async (req, res) => {
     categories,
     organizerContact,
     banner,
-    location
+    location,
   } = req.body;
 
   try {
@@ -48,7 +60,7 @@ router.post("/events", async (req, res) => {
       organizerName,
       organizerContact,
       banner,
-      location
+      location,
     });
 
     await event.save();
@@ -61,9 +73,32 @@ router.post("/events", async (req, res) => {
 
 // Update an event (UPDATE)
 router.put("/events/:id", async (req, res) => {
+  const {
+    name,
+    details,
+    date,
+    timeStart,
+    timeEnd,
+    organizerName,
+    categories,
+    organizerContact,
+    banner,
+    location,
+    attendees
+  } = req.body;
   try {
     await Event.findByIdAndUpdate(req.params.id, {
-      completed: req.body.completed === "on",
+      name,
+      details,
+      date,
+      timeStart,
+      timeEnd,
+      categories,
+      organizerName,
+      organizerContact,
+      banner,
+      location,
+      attendees
     });
     res.redirect("/");
   } catch (err) {
@@ -84,7 +119,7 @@ router.delete("/events/:id", async (req, res) => {
 // UPDATE RSVP
 router.patch("/events/rsvp/:id", async (req, res) => {
   const { id } = req.params;
-  try{
+  try {
     const updatedEvent = await Event.findByIdAndUpdate(
       id,
       { $inc: { attendees: 1 } },
@@ -92,16 +127,14 @@ router.patch("/events/rsvp/:id", async (req, res) => {
     );
 
     if (!updatedEvent) {
-      return res.status(404).json({ message: 'Event not found' });
+      return res.status(404).json({ message: "Event not found" });
     }
 
     res.status(200).json(updatedEvent);
-  }catch (err){
+  } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'An error occurred' });
+    res.status(500).json({ message: "An error occurred" });
   }
-
-})
-
+});
 
 module.exports = router;

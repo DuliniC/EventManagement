@@ -24,8 +24,12 @@ document.addEventListener("DOMContentLoaded", function () {
   var selects = document.querySelectorAll("select");
   M.FormSelect.init(selects);
 
-  var elems = document.querySelectorAll(".modal");
-  M.Modal.init(elems);
+  var modal = document.querySelectorAll(".modal");
+  M.Modal.init(modal, {
+    onCloseEnd: function (el) {
+      location.reload();
+    },
+  });
 
   // Open side panel
   addCategoryBtn.addEventListener("click", () => {
@@ -260,7 +264,7 @@ async function getCategories() {
   }
 }
 
-//Show Categories inside Side Panel
+//Show Categories inside Category Side Panel
 function showCategories(categories) {
   const categoryList = document.getElementById("categoryList");
   categoryList.innerHTML = "";
@@ -268,7 +272,11 @@ function showCategories(categories) {
   const table = document.createElement("table");
   const tbody = document.createElement("tbody");
 
-  populateSelect(categories);
+  //populateSelect(categories);
+  var select = document.getElementById("selectCategory");
+  var selectEdit = document.getElementById("edit-selectCategory");
+  populateSelect(categories, select);
+  populateSelect(categories, selectEdit);
 
   categories.forEach((category) => {
     const tr = document.createElement("tr");
@@ -307,7 +315,7 @@ function showCategoryFilters(categories) {
     "white",
     "z-depth-1",
     "activeCard"
-  ); 
+  );
 
   allCard.innerHTML = `<h5>All</h5>`;
 
@@ -509,11 +517,9 @@ function viewEvent(event) {
   document.getElementById("edit-organizerContact").value =
     event.organizerContact;
   document.getElementById("edit-event-location").value = event.location.address;
+  document.getElementById("edit-selectCategory").value = selectedCategories;
 
-  //cat
-  /* const selectElement = document.getElementById("selectCategory");
-  
-  Array.from(selectElement.options).forEach(option => {
+  /* Array.from(selectElement.options).forEach(option => {
     // Check if the option's value is in the categories array
     if (selectedCategories.includes(option.value)) {
       option.selected = true; // Set it as selected
@@ -524,7 +530,7 @@ function viewEvent(event) {
   //img
 }
 
-//Delete Event 
+//Delete Event
 function deleteEvent(eventId) {
   if (confirm("Are you sure you want to delete this event?")) {
     fetch(`/events/${eventId}`, {
@@ -559,7 +565,7 @@ function updateEvent(eventId, updatedEvent) {
     .then((data) => {
       if (data.success) {
         alert("Event updated successfully");
-        location.reload(); 
+        location.reload();
       } else {
         alert("Failed to update event");
       }
@@ -570,9 +576,32 @@ function updateEvent(eventId, updatedEvent) {
 }
 
 // Populate Categories into Event add Form
-function populateSelect(data) {
+/* function populateSelect(data) {
   var select = document.getElementById("selectCategory");
 
+  var instance = M.FormSelect.getInstance(select);
+  if (instance) {
+    instance.destroy();
+  }
+  select.innerHTML = `<option value="" disabled>--Select an option--</option>`;
+
+  data.forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item._id;
+    option.textContent = item.name;
+    option.index;
+    select.appendChild(option);
+  });
+
+  M.FormSelect.init(select);
+
+  var dropdownItems = document.querySelectorAll(".select-dropdown li");
+  dropdownItems.forEach(function (item, index) {
+    item.setAttribute("tabindex", (index + 1).toString());
+  });
+} */
+
+function populateSelect(data, select) {
   var instance = M.FormSelect.getInstance(select);
   if (instance) {
     instance.destroy();
@@ -699,7 +728,7 @@ async function initMap() {
   });
 }
 
-//Setup Location place Autocomplete 
+//Setup Location place Autocomplete
 async function initMapPlace() {
   //@ts-ignore
   await google.maps.importLibrary("places");

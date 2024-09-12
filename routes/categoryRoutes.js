@@ -39,9 +39,9 @@ router.delete("/categories/:id", async (req, res) => {
   const { id } = req.params;
   try {
     await Category.findByIdAndDelete(id);
+    res.json()
   } catch (err) {
     res.status(500).send(err);
-    console.log(err);
   }
 });
 

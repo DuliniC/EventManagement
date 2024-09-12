@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   //Submit Event Form
-  eventAddForm.addEventListener("submit", function (event) {
+  eventAddForm.addEventListener("submit", async function (event) {
     var location = document.getElementById("event-location");
 
     event.preventDefault();
@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     try {
-      fetch("/events", {
+      await fetch("/events", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -216,6 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eventAddForm.reset();
       imagePreview.src = "";
       sidePanelE.classList.remove("open");
+      window.location.reload();
       getEvents();
     } catch (err) {
       M.toast({ html: "Event Adding Failed" });

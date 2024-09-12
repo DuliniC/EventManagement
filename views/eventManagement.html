@@ -32,9 +32,9 @@
 
     <!-- Category Filter Section -->
     <div class="category-filters">
-        <h5><b>Filter by Categories</b></h5>
+        <h4>Filter by Categories</h4>
         <div id="scroll-container" class="options-container">
-            
+
         </div>
     </div>
 
@@ -45,13 +45,13 @@
     <div id="spinner" class="spinner"></div>
 
     <!-- Google Map -->
-    <h5><b>Event Locations</b></h5>
+    <h4>Event Locations</h4>
     <div id="map"></div>
 
     <!--Add Category Side Panel -->
     <div id="sidePanelC" class="side-panel">
         <span id="closePanel" class="close-btn"><i class="material-icons">close</i></span>
-        <h5>Event Categories</h5>
+        <h4>Event Categories</h4>
 
         <form action="/categories" method="POST" id="categoryForm">
 
@@ -133,25 +133,79 @@
 
 
     <div id="eventModal" class="modal">
-        <div class="modal-content">
-          <h4 id="modal-title" class="modal-header">Event Details</h4>
-          <p id="modal-content" class="modal-body">Event description goes here...</p>
+        <!--Event View-->
+        <div class="modal-content" id="event-details-view">
+            <h4 id="modal-title" class="modal-header">Event Details</h4>
+            <p id="modal-content" class="modal-body">Event description goes here...</p>
         </div>
-        <div class="modal-footer">
-          <a href="#!" class="waves-effect waves-light blue btn">Update</a>
-          <a href="#!" class="waves-effect waves-light red btn">Delete</a>
-          <a href="#!" class="modal-close waves-effect waves-light btn">Back</a>
-        </div>
-    </div>
 
-    </form>
+        <!--Event Update View-->
+        <form id="edit-event-form" style="display: none;">
+            <h4>Update Event</h4>
+            <div class="input-field">
+                <input id="edit-event-name" type="text" required>
+                <label for="edit-event-name">Event Name</label>
+            </div>
+            <div class="input-field">
+                <textarea id="edit-details" class="materialize-textarea"></textarea>
+                <label for="edit-details">Event Details</label>
+            </div>
+            <div class="input-field">
+                <label for="edit-date">Date</label>
+                <input type="text" id="edit-date" class="datepicker" required>
+
+            </div>
+            <div class="input-field">
+                <input type="text" id="edit-timeStart" class="timepicker" required>
+                <label for="edit-timeStart">Start Time</label>
+            </div>
+            <div class="input-field">
+                <input type="text" id="edit-timeEnd" class="timepicker" required>
+                <label for="edit-timeEnd">End Time</label>
+            </div>
+            <div class="input-field">
+                <input id="event-location" type="text" required>
+                <label for="event-location">Location</label>
+            </div>
+            <div class="input-field">
+                <input id="edit-organizerName" type="text" required>
+                <label for="edit-organizerName">Organizer's Name</label>
+            </div>
+            <div class="input-field">
+                <input id="edit-organizerContact" type="text" required>
+                <label for="edit-organizerContact">Organizer's Contact Number</label>
+            </div>
+            <div class="input-field">
+                <select multiple id="edit-selectCategory" class="materialSelect"></select>
+                <label>Categories</label>
+            </div>
+
+            <div class="file-field input-field">
+                <div class="waves-effect waves-light btn"><i class="material-icons left">arrow_upward</i>Upload
+                    <input type="file" accept="image/*" id="event-banner">
+                </div>
+
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+                <img id="edit-imagePreview">
+            </div>
+        </form>
+
+        <div class="modal-footer">
+            <a href="#!" class="waves-effect waves-light blue btn" id="edit-event-btn">Update</a>
+            <a href="" class="waves-effect waves-light red btn" id="delete-event-btn">Delete</a>
+            <a id="save-update-btn" href="" class="waves-effect waves-light green btn" style="display:none;">Save</a>
+            <a href="" class="modal-close waves-effect waves-light btn">Back</a>
+        </div>
+
     </div>
     <script>(g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
             ({ key: "AIzaSyDV1mLpG7FgmDa9vyXga5l7uJGfM0Sz-Vc", libraries: "places", v: "weekly" });</script>
 
     <script>
 
-        
+
     </script>
 
 

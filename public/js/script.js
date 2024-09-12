@@ -23,9 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var selects = document.querySelectorAll("select");
   M.FormSelect.init(selects);
 
-  var elems = document.querySelectorAll('.modal');
+  var elems = document.querySelectorAll(".modal");
   M.Modal.init(elems);
-
 
   // Open side panel
   addCategoryBtn.addEventListener("click", () => {
@@ -147,6 +146,36 @@ document.addEventListener("DOMContentLoaded", function () {
     reader.readAsDataURL(file);
   });
 
+  document
+    .getElementById("edit-event-btn")
+    .addEventListener("click", function () {
+      // Hide read-only view and show edit form
+      document.getElementById("event-details-view").style.display = "none";
+      document.getElementById("edit-event-form").style.display = "block";
+      document.getElementById("edit-event-btn").style.display = "none";
+      document.getElementById("delete-event-btn").style.display = "none";
+      document.getElementById("save-update-btn").style.display = "inline-block"; 
+    });
+
+  document
+    .getElementById("save-update-btn")
+    .addEventListener("click", function () {
+      const updatedEvent = {
+        name: document.getElementById("edit-event-name").value,
+        date: document.getElementById("edit-date").value,
+        timeStart: document.getElementById("edit-timeStart").value,
+        timeEnd: document.getElementById("edit-timeEnd").value,
+        location: {
+          address: document.getElementById("edit-location").value,
+          latitude: Number(location.getAttribute("latitude")),
+          longitude: Number(location.getAttribute("longitude")),
+        },
+        details: document.getElementById("edit-details").value,
+      };
+
+      updateEvent(selectedEventId, updatedEvent);
+    });
+
   //Submit Event Form
   eventAddForm.addEventListener("submit", function (event) {
     var location = document.getElementById("event-location");
@@ -192,6 +221,14 @@ document.addEventListener("DOMContentLoaded", function () {
       M.toast({ html: "Event Adding Failed" });
     }
   });
+
+  document
+    .getElementById("delete-event-btn")
+    .addEventListener("click", function () {
+      if (selectedEventId) {
+        deleteEvent(selectedEventId);
+      }
+    });
 });
 
 // GET categories
@@ -371,8 +408,8 @@ function setEventCardContainer(events) {
     `;
     cardContainer.appendChild(card);
 
-    const viewButton = card.querySelector('.view-event-btn');
-    viewButton.addEventListener('click', () => viewEvent(event));
+    const viewButton = card.querySelector(".view-event-btn");
+    viewButton.addEventListener("click", () => viewEvent(event));
 
     var marker = new google.maps.Marker({
       position: { lat: event.location.latitude, lng: event.location.longitude },
@@ -397,37 +434,117 @@ function setEventCardContainer(events) {
   });
 }
 
+let selectedEventId = null;
+let selectedEventAttendess = 0;
+
 function viewEvent(event) {
   const modal = document.getElementById("eventModal");
-    const modalTitle = document.getElementById("modal-title");
-    const modalContent = document.getElementById("modal-content");
+  const modalTitle = document.getElementById("modal-title");
+  const modalContent = document.getElementById("modal-content");
+  selectedEventId = event._id;
+  selectedEventAttendess = event.attendees;
 
-    // Populate the modal with event details
-    modalTitle.innerHTML = event.name;
-    modalContent.innerHTML = `
+  modalTitle.innerHTML = event.name;
+  modalContent.innerHTML = `
     <div class="row">
      <div class="col s12 m6 l6">
-      <img id="modal-image" src="data:image/png;base64,${event.banner}" alt="Event Image" class="responsive-img modal-image">
+      <img id="modal-image" src="data:image/png;base64,${
+        event.banner
+      }" alt="Event Image" class="responsive-img modal-image">
      </div>
      <div class="col s12 m6 l6">
       <p id="modal-date-time" class="modal-info">
-      <i class="material-icons">event</i><b>Date:</b> ${new Date(event.date).toDateString()}</p>
+      <i class="material-icons">event</i><b>Date:</b> ${new Date(
+        event.date
+      ).toDateString()}</p>
       <p id="modal-date-time" class="modal-info">
-      <i class="material-icons">timelapse</i><b>Time:</b> ${event.timeStart} - ${event.timeEnd}</p>
+      <i class="material-icons">timelapse</i><b>Time:</b> ${
+        event.timeStart
+      } - ${event.timeEnd}</p>
       <p id="modal-location" class="modal-info">
-      <i class="material-icons">location_city</i><b>Location:</b> ${event.location?.address}</p>
+      <i class="material-icons">location_city</i><b>Location:</b> ${
+        event.location.address
+      }</p>
       <p id="modal-organizer" class="modal-info">
-      <i class="material-icons">assignment_ind</i><b>Organizer:</b>${event.organizerName} - ${event.organizerContact}</p>
+      <i class="material-icons">assignment_ind</i><b>Organizer:</b>${
+        event.organizerName
+      } - ${event.organizerContact}</p>
       <p id="modal-location" class="modal-info">
-      <i class="material-icons">location_city</i>${event.attendees} Going to Attend</p>
+      <i class="material-icons">location_city</i>${
+        event.attendees
+      } Going to Attend</p>
       <p id="modal-details" class="modal-info">${event.details}</p>
      </div>
     </div>
     `;
 
-    // Open the modal
-    const modalInstance = M.Modal.getInstance(modal); // Assuming you're using Materialize
-    modalInstance.open();
+  // Open the modal
+  const modalInstance = M.Modal.getInstance(modal);
+  modalInstance.open();
+
+  const selectedCategories = event.categories;
+  document.getElementById("edit-event-name").value = event.name;
+  document.getElementById("edit-date").value = event.date.split("T")[0]; // Format the date properly
+  document.getElementById("edit-timeStart").value = event.timeStart;
+  document.getElementById("edit-timeEnd").value = event.timeEnd;
+  document.getElementById("edit-details").value = event.details;
+  document.getElementById("edit-organizerName").value = event.organizerName;
+  document.getElementById("edit-organizerContact").value = event.organizerContact;
+  document.getElementById("edit-event-location").value = event.location.address;
+
+  //cat
+  /* const selectElement = document.getElementById("selectCategory");
+  
+  Array.from(selectElement.options).forEach(option => {
+    // Check if the option's value is in the categories array
+    if (selectedCategories.includes(option.value)) {
+      option.selected = true; // Set it as selected
+    } else {
+      option.selected = false; // Deselect if not in the array
+    }
+  }); */
+  //img
+}
+
+function deleteEvent(eventId) {
+  fetch(`/events/${eventId}`, {
+    method: "DELETE",
+  })
+    .then((response) => {
+      if (response.ok) {
+        M.toast({ html: "Event deleted successfully" });
+        location.reload();
+      } else {
+        const modalInstance = M.Modal.getInstance(modal);
+        modalInstance.close();
+        M.toast({ html: "Failed to delete the event" });
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+function updateEvent(eventId, updatedEvent) {
+  fetch(`/api/events/${eventId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updatedEvent),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        alert("Event updated successfully");
+        location.reload(); // Optionally reload to see changes
+      } else {
+        alert("Failed to update event");
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
 }
 
 function populateSelect(data) {
@@ -444,7 +561,7 @@ function populateSelect(data) {
     option.value = item._id;
     option.textContent = item.name;
     option.index;
-    select.appendChild(option); 
+    select.appendChild(option);
   });
 
   M.FormSelect.init(select);

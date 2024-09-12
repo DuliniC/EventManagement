@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   initMap();
   getEvents();
-  fetchCategories();
+  getCategories();
   const sidePanelC = document.getElementById("sidePanelC");
   const sidePanelE = document.getElementById("sidePanelE");
   const addCategoryBtn = document.getElementById("addCategoryBtn");
@@ -24,8 +24,12 @@ document.addEventListener("DOMContentLoaded", function () {
   var selects = document.querySelectorAll("select");
   M.FormSelect.init(selects);
 
-  var elems = document.querySelectorAll(".modal");
-  M.Modal.init(elems);
+  var modal = document.querySelectorAll(".modal");
+  M.Modal.init(modal, {
+    onCloseEnd: function (el) {
+      location.reload();
+    },
+  });
 
   // Open side panel
   addCategoryBtn.addEventListener("click", () => {
@@ -69,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelE.classList.add("open");
-    fetchCategories();
+    getCategories();
     initMapPlace();
   });
 
@@ -86,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
     eventLocation = {};
   });
 
-  //category filter move
+  //category filter area horizontal scroll
   const scrollContainer = document.getElementById("scroll-container");
   let isDragging = false;
   let startX;
@@ -113,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!isDragging) return;
     e.preventDefault();
     const x = e.pageX - scrollContainer.offsetLeft;
-    const walk = (x - startX) * 2; // Adjust scroll speed
+    const walk = (x - startX) * 2;
     scrollContainer.scrollLeft = scrollLeft - walk;
   });
 
@@ -132,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
   scrollContainer.addEventListener("touchmove", (e) => {
     if (!isDragging) return;
     const x = e.touches[0].pageX - scrollContainer.offsetLeft;
-    const walk = (x - startX) * 2; // Adjust scroll speed
+    const walk = (x - startX) * 2;
     scrollContainer.scrollLeft = scrollLeft - walk;
   });
 
@@ -240,8 +244,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+let markers = [];
+let currentInfoWindow = null;
+let selectedEventId = null;
+let selectedEventAttendess = 0;
+let map;
+
 // GET categories
-async function fetchCategories() {
+async function getCategories() {
   try {
     await fetch("/categories")
       .then((response) => response.json())
@@ -254,6 +264,7 @@ async function fetchCategories() {
   }
 }
 
+//Show Categories inside Category Side Panel
 function showCategories(categories) {
   const categoryList = document.getElementById("categoryList");
   categoryList.innerHTML = "";
@@ -261,7 +272,11 @@ function showCategories(categories) {
   const table = document.createElement("table");
   const tbody = document.createElement("tbody");
 
-  populateSelect(categories);
+  //populateSelect(categories);
+  var select = document.getElementById("selectCategory");
+  var selectEdit = document.getElementById("edit-selectCategory");
+  populateSelect(categories, select);
+  populateSelect(categories, selectEdit);
 
   categories.forEach((category) => {
     const tr = document.createElement("tr");
@@ -288,11 +303,11 @@ function showCategories(categories) {
   categoryList.appendChild(table);
 }
 
+//Show Category Filters
 function showCategoryFilters(categories) {
   const cardList = document.getElementById("scroll-container");
   cardList.innerHTML = "";
 
-  // Create and append the "All" category button
   const allCard = document.createElement("div");
   allCard.classList.add(
     "option-card",
@@ -300,11 +315,10 @@ function showCategoryFilters(categories) {
     "white",
     "z-depth-1",
     "activeCard"
-  ); // Make "All" active by default
+  );
 
   allCard.innerHTML = `<h5>All</h5>`;
 
-  // Add event listener for the "All" category
   allCard.addEventListener("click", function () {
     document.querySelectorAll(".option-card").forEach((card) => {
       card.classList.remove("activeCard");
@@ -347,6 +361,7 @@ async function getEvents() {
   }
 }
 
+//Get Events by filtered Category
 async function getEventsByCategory(category) {
   try {
     showSpinner();
@@ -360,9 +375,7 @@ async function getEventsByCategory(category) {
   }
 }
 
-let markers = [];
-let currentInfoWindow = null;
-
+//Show Events in Page
 function setEventCardContainer(events) {
   const cardContainer = document.getElementById("event-container");
   cardContainer.innerHTML = "";
@@ -448,9 +461,7 @@ function setEventCardContainer(events) {
   });
 }
 
-let selectedEventId = null;
-let selectedEventAttendess = 0;
-
+//View of an Event when click view btn
 function viewEvent(event) {
   const modal = document.getElementById("eventModal");
   const modalTitle = document.getElementById("modal-title");
@@ -506,11 +517,9 @@ function viewEvent(event) {
   document.getElementById("edit-organizerContact").value =
     event.organizerContact;
   document.getElementById("edit-event-location").value = event.location.address;
+  document.getElementById("edit-selectCategory").value = selectedCategories;
 
-  //cat
-  /* const selectElement = document.getElementById("selectCategory");
-  
-  Array.from(selectElement.options).forEach(option => {
+  /* Array.from(selectElement.options).forEach(option => {
     // Check if the option's value is in the categories array
     if (selectedCategories.includes(option.value)) {
       option.selected = true; // Set it as selected
@@ -521,6 +530,7 @@ function viewEvent(event) {
   //img
 }
 
+//Delete Event
 function deleteEvent(eventId) {
   if (confirm("Are you sure you want to delete this event?")) {
     fetch(`/events/${eventId}`, {
@@ -542,6 +552,7 @@ function deleteEvent(eventId) {
   }
 }
 
+//Update Event API Call
 function updateEvent(eventId, updatedEvent) {
   fetch(`/api/events/${eventId}`, {
     method: "PUT",
@@ -554,7 +565,7 @@ function updateEvent(eventId, updatedEvent) {
     .then((data) => {
       if (data.success) {
         alert("Event updated successfully");
-        location.reload(); // Optionally reload to see changes
+        location.reload();
       } else {
         alert("Failed to update event");
       }
@@ -564,7 +575,8 @@ function updateEvent(eventId, updatedEvent) {
     });
 }
 
-function populateSelect(data) {
+// Populate Categories into Event add Form
+/* function populateSelect(data) {
   var select = document.getElementById("selectCategory");
 
   var instance = M.FormSelect.getInstance(select);
@@ -587,8 +599,32 @@ function populateSelect(data) {
   dropdownItems.forEach(function (item, index) {
     item.setAttribute("tabindex", (index + 1).toString());
   });
+} */
+
+function populateSelect(data, select) {
+  var instance = M.FormSelect.getInstance(select);
+  if (instance) {
+    instance.destroy();
+  }
+  select.innerHTML = `<option value="" disabled>--Select an option--</option>`;
+
+  data.forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item._id;
+    option.textContent = item.name;
+    option.index;
+    select.appendChild(option);
+  });
+
+  M.FormSelect.init(select);
+
+  var dropdownItems = document.querySelectorAll(".select-dropdown li");
+  dropdownItems.forEach(function (item, index) {
+    item.setAttribute("tabindex", (index + 1).toString());
+  });
 }
 
+//RSVP Count Increase
 function updateRSVP(id) {
   const attendeesCount = document.getElementById(`attendees-count-${id}`);
   let count = attendeesCount.textContent.split(" ")[0];
@@ -604,13 +640,14 @@ function updateRSVP(id) {
   }
 }
 
+//Delete Category
 async function deleteCategory(id) {
   if (confirm("Are you sure you want to delete this item?")) {
     try {
       await fetch(`/categories/${id}`, {
         method: "DELETE",
       });
-      fetchCategories();
+      getCategories();
       M.toast({ html: "Category Deleted" });
       const row = document.getElementById(`category-row-${id}`);
       if (row) {
@@ -622,6 +659,7 @@ async function deleteCategory(id) {
   }
 }
 
+//Update Category
 function updateCategory(id) {
   document
     .querySelectorAll("button")
@@ -635,6 +673,7 @@ function updateCategory(id) {
         <button class="btn-small red waves-effect waves-light btn" onclick="cancelUpdateCategory('${id}','${categoryValue}')">Cancel</button>`;
 }
 
+//Category Update Cancel
 function cancelUpdateCategory(id, value) {
   document
     .querySelectorAll("button")
@@ -643,6 +682,7 @@ function cancelUpdateCategory(id, value) {
   cell.textContent = value;
 }
 
+//Save Category Update
 async function saveUpdateCategory(id) {
   document
     .querySelectorAll("button")
@@ -663,7 +703,7 @@ async function saveUpdateCategory(id) {
       ),
     });
     M.toast({ html: "Category Updated" });
-    fetchCategories();
+    getCategories();
   } catch (err) {
     console.log();
   }
@@ -677,8 +717,7 @@ function hideSpinner() {
   document.getElementById("spinner").style.display = "none";
 }
 
-let map;
-
+// Load map
 async function initMap() {
   const { Map } = await google.maps.importLibrary("maps");
   await google.maps.importLibrary("places");
@@ -689,6 +728,7 @@ async function initMap() {
   });
 }
 
+//Setup Location place Autocomplete
 async function initMapPlace() {
   //@ts-ignore
   await google.maps.importLibrary("places");

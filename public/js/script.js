@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("edit-event-form").style.display = "block";
       document.getElementById("edit-event-btn").style.display = "none";
       document.getElementById("delete-event-btn").style.display = "none";
-      document.getElementById("save-update-btn").style.display = "inline-block"; 
+      document.getElementById("save-update-btn").style.display = "inline-block";
     });
 
   document
@@ -489,7 +489,8 @@ function viewEvent(event) {
   document.getElementById("edit-timeEnd").value = event.timeEnd;
   document.getElementById("edit-details").value = event.details;
   document.getElementById("edit-organizerName").value = event.organizerName;
-  document.getElementById("edit-organizerContact").value = event.organizerContact;
+  document.getElementById("edit-organizerContact").value =
+    event.organizerContact;
   document.getElementById("edit-event-location").value = event.location.address;
 
   //cat
@@ -587,11 +588,12 @@ function updateRSVP(id) {
   }
 }
 
-function deleteCategory(id) {
+async function deleteCategory(id) {
   try {
-    fetch(`/categories/${id}`, {
+    await fetch(`/categories/${id}`, {
       method: "DELETE",
-    });
+    })
+    fetchCategories();
     M.toast({ html: "Category Deleted" });
     const row = document.getElementById(`category-row-${id}`);
     if (row) {
@@ -623,7 +625,7 @@ function cancelUpdateCategory(id, value) {
   cell.textContent = value;
 }
 
-function saveUpdateCategory(id) {
+async function saveUpdateCategory(id) {
   document
     .querySelectorAll("button")
     .forEach((button) => (button.disabled = false));
@@ -632,7 +634,7 @@ function saveUpdateCategory(id) {
   cell.textContent = newValue;
 
   try {
-    fetch(`/categories/${id}`, {
+    await fetch(`/categories/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -643,6 +645,7 @@ function saveUpdateCategory(id) {
       ),
     });
     M.toast({ html: "Category Updated" });
+    fetchCategories();
   } catch (err) {
     console.log();
   }

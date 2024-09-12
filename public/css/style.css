@@ -246,3 +246,7 @@ h5 {
 .pac-container {
     z-index: 10000 !important;
 }
+
+#toast{
+    z-index: 1000 !important;
+}

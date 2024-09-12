@@ -1,5 +1,7 @@
 const express = require("express");
 const Category = require("../models/Category");
+const Event = require("../models/Event");
+
 const router = express.Router();
 
 // Get all categories (GET)
@@ -12,6 +14,7 @@ router.get("/categories", async (req, res) => {
   }
 });
 
+//Get by ID
 router.get("/categories/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -38,8 +41,13 @@ router.post("/categories", async (req, res) => {
 router.delete("/categories/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    await Category.findByIdAndDelete(id);
-    res.json()
+    const data = await Event.find({ categories: { $in: [id] } });
+    if(data.length > 0){
+      res.status(400).json({message : "This Category cannot be deleted since Associated with events."})
+    }else{
+      await Category.findByIdAndDelete(id);
+      res.status(200).json({message : "Category Deleted"})  
+    }
   } catch (err) {
     res.status(500).send(err);
   }

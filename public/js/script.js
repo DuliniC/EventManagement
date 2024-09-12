@@ -664,20 +664,28 @@ async function deleteCategory(id) {
     try {
       await fetch(`/categories/${id}`, {
         method: "DELETE",
+      }).then((response) => {
+        if (response.ok) {
+          M.toast({ html: "Category Deleted", classes: "toast" });
+          const row = document.getElementById(`category-row-${id}`);
+          if (row) {
+            row.remove();
+          }
+        } else {
+          M.toast({
+            html: "This already associated with Events",
+            classes: "toast",
+          });
+        }
       });
       getCategories();
-      M.toast({ html: "Category Deleted" });
-      const row = document.getElementById(`category-row-${id}`);
-      if (row) {
-        row.remove();
-      }
     } catch (err) {
-      console.log();
+      console.log(err);
     }
   }
 }
 
-//Update Category
+//Update Category View Setup
 function updateCategory(id) {
   document
     .querySelectorAll("button")

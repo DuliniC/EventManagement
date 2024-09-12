@@ -6,7 +6,7 @@ const router = express.Router();
 router.get("/categories", async (req, res) => {
   try {
     const categories = await Category.find();
-    res.json(categories); // Send as JSON to frontend
+    res.json(categories);
   } catch (err) {
     res.status(500).send(err);
   }
@@ -16,7 +16,7 @@ router.get("/categories/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const category = await Category.findById(id);
-    res.json(category); // Send as JSON to frontend
+    res.json(category);
   } catch (err) {
     res.status(500).send(err);
   }

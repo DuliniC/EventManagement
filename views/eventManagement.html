@@ -18,7 +18,7 @@
 
 <body>
     <nav>
-        <div class="nav-wrapper grey lighten-5">
+        <div class="nav-wrapper blue accent-4 nav">
             <a href="#" class="brand-logo black-text text-darken-2">Event Management</a>
         </div>
     </nav>
@@ -37,7 +37,6 @@
 
         </div>
     </div>
-
 
     <!--events-->
     <div class="card-container" id="event-container">
@@ -130,6 +129,8 @@
             </div>
         </form>
     </div>
+
+    <!--Event Detail Modal-->
     <div id="eventModal" class="modal">
         <!--Event View-->
         <div class="modal-content" id="event-details-view">
@@ -138,7 +139,7 @@
         </div>
 
         <!--Event Update View-->
-        <div>
+        <div class="container">
             <form id="edit-event-form" style="display: none;">
                 <h4>Update Event</h4>
                 <br>
@@ -181,7 +182,7 @@
                 </div>
 
                 <div class="file-field input-field">
-                    <div class="waves-effect waves-light btn"><i class="material-icons left">arrow_upward</i>Upload
+                    <div class="waves-effect waves-light btn"><i class="material-icons left">arrow_upward</i>Upload New
                         <input type="file" accept="image/*" id="event-banner">
                     </div>
 

@@ -299,7 +299,7 @@ function showCategoryFilters(categories) {
     "center-align",
     "white",
     "z-depth-1",
-    "active"
+    "activeCard"
   ); // Make "All" active by default
 
   allCard.innerHTML = `<h5>All</h5>`;
@@ -307,9 +307,9 @@ function showCategoryFilters(categories) {
   // Add event listener for the "All" category
   allCard.addEventListener("click", function () {
     document.querySelectorAll(".option-card").forEach((card) => {
-      card.classList.remove("active");
+      card.classList.remove("activeCard");
     });
-    allCard.classList.add("active");
+    allCard.classList.add("activeCard");
     getEvents();
   });
 
@@ -323,10 +323,10 @@ function showCategoryFilters(categories) {
 
     card.addEventListener("click", function () {
       document.querySelectorAll(".option-card").forEach((card) => {
-        card.classList.remove("active");
+        card.classList.remove("activeCard");
       });
 
-      card.classList.add("active");
+      card.classList.add("activeCard");
       getEventsByCategory(category._id);
     });
     cardList.appendChild(card);
@@ -361,6 +361,7 @@ async function getEventsByCategory(category) {
 }
 
 let markers = [];
+let currentInfoWindow = null;
 
 function setEventCardContainer(events) {
   const cardContainer = document.getElementById("event-container");
@@ -436,7 +437,11 @@ function setEventCardContainer(events) {
     });
 
     marker.addListener("click", function () {
+      if (currentInfoWindow) {
+        currentInfoWindow.close();
+      }
       infoWindow.open(map, marker);
+      currentInfoWindow = infoWindow;
     });
 
     hideSpinner();
@@ -479,7 +484,7 @@ function viewEvent(event) {
         event.organizerName
       } - ${event.organizerContact}</p>
       <p id="modal-location" class="modal-info">
-      <i class="material-icons">location_city</i>${
+      <i class="material-icons">accessibility</i>${
         event.attendees
       } Going to Attend</p>
       <p id="modal-details" class="modal-info">${event.details}</p>

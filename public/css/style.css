@@ -1,5 +1,13 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Inter", sans-serif;
+}
+
+h4 {
+    padding-top: 20px;
+}
+
+.nav {
+    padding-left: 10px;
 }
 
 .btn-container {
@@ -133,7 +141,7 @@ i.icon-view {
 }
 
 .activeCard {
-    background-color: #a9cfef !important;
+    background-color: #8c9eff !important;
 }
 
 /* Hide scrollbar for WebKit browsers */

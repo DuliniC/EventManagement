@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelC.classList.add("open");
+    document.getElementById('overlay').classList.add('visible');
   });
 
   // Close side panel
@@ -51,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sidePanelE.style.display = "none";
     sidePanelE.classList.remove("open");
 
+    document.getElementById('overlay').classList.remove('visible');
     categoryForm.reset();
   });
 
@@ -61,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addEventBtn.style.display = "inline-block";
     sidePanelE.classList.remove("open");
 
+    document.getElementById('overlay').classList.remove('visible');
     eventAddForm.reset();
     imagePreview.src = "";
     bannerBase64String = "";
@@ -73,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelE.classList.add("open");
+    document.getElementById('overlay').classList.add('visible');
     getCategories();
     initMapPlace();
   });

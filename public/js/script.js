@@ -264,6 +264,7 @@ let selectedEventAttendess = 0;
 let map;
 let updatedBannerString = "";
 let existingCategories = [];
+let oldCategoryValue = "";
 
 // GET categories
 async function getCategories() {
@@ -295,6 +296,7 @@ function showCategories(categories) {
 
   categories.forEach((category) => {
     existingCategories.push(category.name);
+
     const tr = document.createElement("tr");
     tr.id = `category-row-${category._id}`;
 
@@ -363,12 +365,11 @@ function showCategoryFilters(categories) {
   });
 }
 
-
 //Validate Categories
-function validateCategory(){
+function validateCategory() {
   const category = document.getElementById("name").value;
-  if(existingCategories.includes(category.trim())){
-    M.toast({html: "This Category already exist",classes:"toast"});
+  if (existingCategories.includes(category.trim())) {
+    M.toast({ html: "This Category already exist", classes: "toast" });
     return false;
   }
 }
@@ -706,6 +707,7 @@ function updateCategory(id) {
 
   const cell = document.getElementById(`category-name-${id}`);
   var categoryValue = cell.textContent;
+  oldCategoryValue = categoryValue;
 
   cell.innerHTML = ` <input type="text" id="edit-category-input-${id}" value="${categoryValue}">
         <button class="btn-small light-blue accent-3 waves-effect waves-light btn" onClick="saveUpdateCategory('${id}')">Save</button>
@@ -727,22 +729,33 @@ async function saveUpdateCategory(id) {
     .querySelectorAll("button")
     .forEach((button) => (button.disabled = false));
   const newValue = document.getElementById(`edit-category-input-${id}`).value;
+
   const cell = document.getElementById(`category-name-${id}`);
   cell.textContent = newValue;
 
   try {
-    await fetch(`/categories/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(
-        // prettier-ignore
-        { "name": newValue }
-      ),
-    });
-    M.toast({ html: "Category Updated" });
-    getCategories();
+    if (existingCategories.includes(newValue.trim())) {
+      M.toast({ html: "This Category already exist", classes: "toast" });
+      cell.textContent = oldCategoryValue;
+      return;
+    }else{
+      await fetch(`/categories/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          // prettier-ignore
+          { "name": newValue }
+        ),
+      })
+      .then((response) => {
+        if(response.ok){
+          M.toast({ html: "Category Updated" , classes:"toast"});
+          getCategories();
+        }
+      });
+    }
   } catch (err) {
     console.log();
   }

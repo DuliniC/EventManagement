@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelC.classList.add("open");
+    document.getElementById('overlay').classList.add('visible');
   });
 
   // Close side panel
@@ -51,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sidePanelE.style.display = "none";
     sidePanelE.classList.remove("open");
 
+    document.getElementById('overlay').classList.remove('visible');
     categoryForm.reset();
   });
 
@@ -61,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addEventBtn.style.display = "inline-block";
     sidePanelE.classList.remove("open");
 
+    document.getElementById('overlay').classList.remove('visible');
     eventAddForm.reset();
     imagePreview.src = "";
     bannerBase64String = "";
@@ -73,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelE.classList.add("open");
+    document.getElementById('overlay').classList.add('visible');
     getCategories();
     initMapPlace();
   });
@@ -263,6 +267,9 @@ let selectedEventId = null;
 let selectedEventAttendess = 0;
 let map;
 let updatedBannerString = "";
+let existingCategories = [];
+let oldCategoryValue = "";
+
 // GET categories
 async function getCategories() {
   try {
@@ -285,13 +292,15 @@ function showCategories(categories) {
   const table = document.createElement("table");
   const tbody = document.createElement("tbody");
 
-  //populateSelect(categories);
   var select = document.getElementById("selectCategory");
   var selectEdit = document.getElementById("edit-selectCategory");
   populateSelect(categories, select);
   populateSelect(categories, selectEdit);
+  existingCategories.length = 0;
 
   categories.forEach((category) => {
+    existingCategories.push(category.name);
+
     const tr = document.createElement("tr");
     tr.id = `category-row-${category._id}`;
 
@@ -358,6 +367,15 @@ function showCategoryFilters(categories) {
     });
     cardList.appendChild(card);
   });
+}
+
+//Validate Categories
+function validateCategory() {
+  const category = document.getElementById("name").value;
+  if (existingCategories.includes(category.trim())) {
+    M.toast({ html: "This Category already exist", classes: "toast" });
+    return false;
+  }
 }
 
 //GET All Events
@@ -693,6 +711,7 @@ function updateCategory(id) {
 
   const cell = document.getElementById(`category-name-${id}`);
   var categoryValue = cell.textContent;
+  oldCategoryValue = categoryValue;
 
   cell.innerHTML = ` <input type="text" id="edit-category-input-${id}" value="${categoryValue}">
         <button class="btn-small light-blue accent-3 waves-effect waves-light btn" onClick="saveUpdateCategory('${id}')">Save</button>
@@ -714,22 +733,33 @@ async function saveUpdateCategory(id) {
     .querySelectorAll("button")
     .forEach((button) => (button.disabled = false));
   const newValue = document.getElementById(`edit-category-input-${id}`).value;
+
   const cell = document.getElementById(`category-name-${id}`);
   cell.textContent = newValue;
 
   try {
-    await fetch(`/categories/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(
-        // prettier-ignore
-        { "name": newValue }
-      ),
-    });
-    M.toast({ html: "Category Updated" });
-    getCategories();
+    if (existingCategories.includes(newValue.trim())) {
+      M.toast({ html: "This Category already exist", classes: "toast" });
+      cell.textContent = oldCategoryValue;
+      return;
+    }else{
+      await fetch(`/categories/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          // prettier-ignore
+          { "name": newValue }
+        ),
+      })
+      .then((response) => {
+        if(response.ok){
+          M.toast({ html: "Category Updated" , classes:"toast"});
+          getCategories();
+        }
+      });
+    }
   } catch (err) {
     console.log();
   }

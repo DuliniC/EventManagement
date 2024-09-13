@@ -263,6 +263,8 @@ let selectedEventId = null;
 let selectedEventAttendess = 0;
 let map;
 let updatedBannerString = "";
+let existingCategories = [];
+
 // GET categories
 async function getCategories() {
   try {
@@ -285,13 +287,14 @@ function showCategories(categories) {
   const table = document.createElement("table");
   const tbody = document.createElement("tbody");
 
-  //populateSelect(categories);
   var select = document.getElementById("selectCategory");
   var selectEdit = document.getElementById("edit-selectCategory");
   populateSelect(categories, select);
   populateSelect(categories, selectEdit);
+  existingCategories.length = 0;
 
   categories.forEach((category) => {
+    existingCategories.push(category.name);
     const tr = document.createElement("tr");
     tr.id = `category-row-${category._id}`;
 
@@ -358,6 +361,16 @@ function showCategoryFilters(categories) {
     });
     cardList.appendChild(card);
   });
+}
+
+
+//Validate Categories
+function validateCategory(){
+  const category = document.getElementById("name").value;
+  if(existingCategories.includes(category.trim())){
+    M.toast({html: "This Category already exist",classes:"toast"});
+    return false;
+  }
 }
 
 //GET All Events

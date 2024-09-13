@@ -52,14 +52,14 @@
         <span id="closePanel" class="close-btn"><i class="material-icons">close</i></span>
         <h4>Event Categories</h4>
 
-        <form action="/categories" method="POST" id="categoryForm">
+        <form action="/categories" method="POST" id="categoryForm" onsubmit="return validateCategory();">
 
             <div class="input-field">
                 <input type="text" id="name" name="name" required>
                 <label for="name">Category Name</label>
             </div>
 
-            <button type="submit" class="btn cyan accent-3">Add</button>
+            <input type="submit" class="btn cyan accent-3" value="Add"/>
 
         </form>
 
@@ -205,8 +205,6 @@
             ({ key: "AIzaSyDV1mLpG7FgmDa9vyXga5l7uJGfM0Sz-Vc", libraries: "places", v: "weekly" });</script>
 
     <script>
-
-
     </script>
 
 

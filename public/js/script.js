@@ -462,7 +462,7 @@ function setEventCardContainer(events) {
             <button class="waves-light btn" id="rsvp-btn-${event._id}" 
                 onclick="updateRSVP('${event._id}',${
       event.attendees
-    })">RSVP</button>
+    })">RSVP</button><br><br>
             <span id="attendees-count-${event._id}">${
       event.attendees
     } Going</span>
@@ -522,25 +522,26 @@ function viewEvent(event) {
      </div>
      <div class="col s12 m6 l6">
       <p id="modal-date-time" class="modal-info">
-      <i class="material-icons">event</i><b>Date:</b> ${new Date(
+      <i class="material-icons">event</i><b>Date: </b> ${new Date(
         event.date
       ).toDateString()}</p>
       <p id="modal-date-time" class="modal-info">
-      <i class="material-icons">timelapse</i><b>Time:</b> ${
+      <i class="material-icons">timelapse</i><b>Time: </b> ${
         event.timeStart
       } - ${event.timeEnd}</p>
       <p id="modal-location" class="modal-info">
-      <i class="material-icons">location_city</i><b>Location:</b> ${
+      <i class="material-icons">location_city</i><b>Location: </b> ${
         event.location.address
       }</p>
       <p id="modal-organizer" class="modal-info">
-      <i class="material-icons">assignment_ind</i><b>Organizer:</b>${
+      <i class="material-icons">assignment_ind</i><b>Organizer: </b>${
         event.organizerName
       } - ${event.organizerContact}</p>
       <p id="modal-location" class="modal-info">
       <i class="material-icons">accessibility</i>${
         selectedEventAttendees
       } Going to Attend</p>
+      <br>
       <p id="modal-details" class="modal-info">${event.details}</p>
      </div>
     </div>

@@ -458,7 +458,7 @@ function setEventCardContainer(events) {
         <div class="row">
           <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
           <div class="col s5">${event.location?.address}</div>
-          <div class="col s5">
+          <div class="col s4">
             <button class="waves-light btn" id="rsvp-btn-${event._id}" 
                 onclick="updateRSVP('${event._id}',${
       event.attendees

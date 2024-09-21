@@ -49,10 +49,10 @@ h4 {
     cursor: pointer;
 }
 
- .card-container {
+.card-container {
     display: inline-flex;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: -24px;
     padding: 24px;
     gap: 20px;
@@ -79,7 +79,8 @@ h4 {
 
 @media screen and (max-width: 1200px) {
     .card {
-        width: calc(33% - 20px); /* 1 card per row on very small screens */
+        width: calc(33% - 20px);
+        /* 3 card per row on very small screens */
     }
 
     .card .icon-view {
@@ -89,7 +90,8 @@ h4 {
 
 @media screen and (max-width: 1000px) {
     .card {
-        width: calc(50% - 20px); /* 2 cards per row on smaller screens */
+        width: calc(50% - 20px);
+        /* 2 cards per row on smaller screens */
     }
 
     .card .icon-view {
@@ -97,9 +99,10 @@ h4 {
     }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 400px) {
     .card {
-        width: 100%; /* 1 card per row on very small screens */
+        width: 100%;
+        /* 1 card per row on very small screens */
     }
 
     .card .icon-view {
@@ -137,8 +140,10 @@ i.icon-view {
 
 .option-card {
     display: inline-block;
-    padding: 10px;
-    border-radius: 8px;
+    padding-inline: 20px;
+    border: 0;
+    border-radius: 100px;
+    box-sizing: border-box;
     cursor: pointer;
     transition: background-color 0.3s ease;
     margin: 1rem;
@@ -152,7 +157,7 @@ i.icon-view {
 }
 
 .activeCard {
-    background-color: #8c9eff !important;
+    background-color: #0A66C2 !important;
 }
 
 /* Hide scrollbar for WebKit browsers */
@@ -183,18 +188,31 @@ i.icon-view {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    border: 16px solid #f3f3f3;
-    border-top: 16px solid #3498db;
+    border: 10px solid #f3f3f3;
+    border-top: 10px solid #3d5afe;
     border-radius: 50%;
     width: 80px;
     height: 80px;
-    animation: spin 2s linear infinite;
+    z-index: 10;
+    animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .modal-image {
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    max-height: 500px;
+    width: auto;
 }
 
 /* Modal Content Styling */
@@ -203,7 +221,7 @@ i.icon-view {
 }
 
 .modal-header {
-    color: #1e88e5;
+    color: #0d47a1;
     font-weight: bold;
     font-size: 28px;
     margin-bottom: 15px;
@@ -216,10 +234,16 @@ i.icon-view {
 
 #modal-date-time,
 #modal-location,
-#modal-details,
 #modal-organizer,
 #modal-contact {
+    font-size: 20px;
+    color: #666
+}
+
+#modal-details {
+    font-style: italic;
     font-size: 18px;
+    color: black
 }
 
 .modal-footer {

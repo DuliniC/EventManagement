@@ -49,7 +49,7 @@ h4 {
     cursor: pointer;
 }
 
-.card-container {
+ .card-container {
     display: inline-flex;
     flex-wrap: wrap;
     align-items: center;
@@ -65,7 +65,7 @@ h4 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: left;
     margin-bottom: 24px;
-    width: 100%
+    width: calc(25% - 20px);
 }
 
 .card-image {
@@ -73,28 +73,37 @@ h4 {
     border-radius: 5px;
 }
 
-@media (min-width: 100em) {
-    .card-container {
-        max-width: 100%;
-        width: calc(100% + 30px)
+.card .icon-view {
+    font-size: 30px;
+}
+
+@media screen and (max-width: 1200px) {
+    .card {
+        width: calc(33% - 20px); /* 1 card per row on very small screens */
     }
 
-    .card {
-        padding: 0 12px;
-        width: 60%
+    .card .icon-view {
+        font-size: 25px;
     }
 }
 
-@media (min-width: 60em) {
-    .card-container {
-        max-width: 100%;
-        width: calc(100% + 50px)
+@media screen and (max-width: 1000px) {
+    .card {
+        width: calc(50% - 20px); /* 2 cards per row on smaller screens */
     }
 
+    .card .icon-view {
+        font-size: 30px;
+    }
+}
+
+@media screen and (max-width: 600px) {
     .card {
-        margin-bottom: 40px;
-        padding: 0 20px;
-        width: 30%
+        width: 100%; /* 1 card per row on very small screens */
+    }
+
+    .card .icon-view {
+        font-size: 25px;
     }
 }
 

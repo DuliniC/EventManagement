@@ -79,7 +79,7 @@ h4 {
 
 @media screen and (max-width: 1200px) {
     .card {
-        width: calc(33% - 20px); /* 1 card per row on very small screens */
+        width: calc(33% - 20px); /* 3 card per row on very small screens */
     }
 
     .card .icon-view {

@@ -99,7 +99,7 @@ router.put("/events/:id", async (req, res) => {
       location,
       attendees,
     });
-    res.status(200).json({message: "Update Successfully"});
+    res.status(200).json({ message: "Update Successfully" });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -118,10 +118,14 @@ router.delete("/events/:id", async (req, res) => {
 // UPDATE RSVP
 router.patch("/events/rsvp/:id", async (req, res) => {
   const { id } = req.params;
+  const { isIncreased } = req.body;
+
   try {
+    const incrementValue = isIncreased ? 1 : -1;
+
     const updatedEvent = await Event.findByIdAndUpdate(
       id,
-      { $inc: { attendees: 1 } },
+      { $inc: { attendees: incrementValue } },
       { new: true, runValidators: true } // `new: true` returns the updated document
     );
 

@@ -31,7 +31,7 @@ router.post("/categories", async (req, res) => {
   const newCategory = new Category({ name });
   try {
     await newCategory.save();
-    res.redirect("/");
+    res.redirect("/Events");
   } catch (err) {
     res.status(500).send(err);
   }

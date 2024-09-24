@@ -15,19 +15,19 @@ app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
 // Connect to DB
 connectDB();
 
-app.get('/', (req, res) => {
+app.get('/events/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'eventManagement.html'));
 });
 
 // Routes
 const categoryRoutes = require('./routes/categoryRoutes');
-app.use('/', categoryRoutes);
+app.use('/events/', categoryRoutes);
 
 const eventRoutes = require('./routes/eventRoutes');
-app.use('/', eventRoutes);
+app.use('/events/', eventRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}/events`);
 });

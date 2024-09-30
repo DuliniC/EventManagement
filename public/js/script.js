@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var bannerBase64String = "";
 
   var dates = document.querySelectorAll(".datepicker");
-  M.Datepicker.init(dates);
+  M.Datepicker.init(dates,{
+    minDate : new Date()
+  });
 
   var time = document.querySelectorAll(".timepicker");
   M.Timepicker.init(time);
@@ -285,13 +287,46 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  socket.on('eventDeleted', (eventId) => {
+  socket.on("eventDeleted", (eventId) => {
     const eventCard = document.getElementById(`${eventId}`);
     eventCard.remove();
-    initMap();
-    getEvents();
   });
 
+  socket.on("eventUpdated", (event) => {
+    const eventCard = document.getElementById(`${event._id}`);
+    eventCard.innerHTML = `
+      <div class="card-image">
+        <img src="data:image/png;base64,${
+          event.banner
+        }" onerror="this.onerror=null; this.src='./img/img-noload.jpg';" alt="Event Image">
+        <span class="card-title">
+          ${new Date(event.date).toDateString()} <br/> 
+          ${event.timeStart} - ${event.timeEnd}
+        </span>
+      </div>
+      <div class="card-content">
+        <span class="card-title">${event.name}</span>
+        <p>${event.details}</p>
+      </div>
+      <div class="card-action">
+        <div class="row">
+          <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
+          <div class="col s5">${event.location?.address}</div>
+          <div class="col s4">
+            <button class="waves-light btn" id="rsvp-btn-${event._id}" 
+                onclick="updateRSVP('${event._id}',${
+      event.attendees
+    })">RSVP</button><br><br>
+            <span id="attendees-count-${event._id}">${
+      event.attendees
+    } Going</span>
+          </div>
+          <div class="col s1">
+          <button class="btn-flat view-event-btn"><i class="material-icons icon-view">visibility</i></button></div>
+        </div>
+      </div>
+    `;
+  });
   
 });
 

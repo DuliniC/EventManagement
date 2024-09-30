@@ -86,7 +86,7 @@ router.put("/events/:id", async (req, res) => {
     attendees,
   } = req.body;
   try {
-    await Event.findByIdAndUpdate(req.params.id, {
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, {
       name,
       details,
       date,
@@ -98,7 +98,8 @@ router.put("/events/:id", async (req, res) => {
       banner,
       location,
       attendees,
-    });
+    },{ new: true });
+    req.io.emit("eventUpdated", updatedEvent);
     res.status(200).json({ message: "Update Successfully" });
   } catch (err) {
     res.status(500).send(err);

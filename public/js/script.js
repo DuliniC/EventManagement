@@ -35,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-
   // Open side panel
   addCategoryBtn.addEventListener("click", () => {
     sidePanelC.style.width = "25%";
@@ -43,8 +42,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelC.classList.add("open");
-    document.getElementById('overlay').classList.add('visible');
-    document.querySelector('body').style.overflow = "hidden";
+    document.getElementById("overlay").classList.add("visible");
+    document.querySelector("body").style.overflow = "hidden";
   });
 
   // Close side panel
@@ -58,8 +57,8 @@ document.addEventListener("DOMContentLoaded", function () {
     sidePanelE.style.display = "none";
     sidePanelE.classList.remove("open");
 
-    document.getElementById('overlay').classList.remove('visible');
-    document.querySelector('body').style.overflow = "visible";
+    document.getElementById("overlay").classList.remove("visible");
+    document.querySelector("body").style.overflow = "visible";
     categoryForm.reset();
   });
 
@@ -70,8 +69,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addEventBtn.style.display = "inline-block";
     sidePanelE.classList.remove("open");
 
-    document.querySelector('body').style.overflow = "visible";
-    document.getElementById('overlay').classList.remove('visible');
+    document.querySelector("body").style.overflow = "visible";
+    document.getElementById("overlay").classList.remove("visible");
     eventAddForm.reset();
     imagePreview.src = "";
     bannerBase64String = "";
@@ -84,8 +83,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelE.classList.add("open");
-    document.getElementById('overlay').classList.add('visible');
-    document.querySelector('body').style.overflow = "hidden";
+    document.getElementById("overlay").classList.add("visible");
+    document.querySelector("body").style.overflow = "hidden";
     getCategories();
     initMapPlace();
   });
@@ -97,8 +96,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addEventBtn.style.display = "inline-block";
     sidePanelE.classList.remove("open");
 
-    document.getElementById('overlay').classList.remove('visible');
-    document.querySelector('body').style.overflow = "visible";
+    document.getElementById("overlay").classList.remove("visible");
+    document.querySelector("body").style.overflow = "visible";
 
     eventAddForm.reset();
     imagePreview.src = "";
@@ -254,7 +253,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eventAddForm.reset();
       imagePreview.src = "";
       sidePanelE.classList.remove("open");
-      document.getElementById('overlay').classList.remove('visible');
+      document.getElementById("overlay").classList.remove("visible");
       getEvents();
       setTimeout(() => {
         window.location.reload();
@@ -271,6 +270,21 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteEvent(selectedEventId);
       }
     });
+
+  //Socket.io Scripts
+  var socket = io();
+
+  socket.on("rsvpUpdated", (data) => {
+    const { eventId, attendees } = data;
+
+    const rsvpCountElement = document.getElementById(
+      `attendees-count-${eventId}`
+    );
+    if (rsvpCountElement) {
+      rsvpCountElement.textContent = `${attendees} Going`;
+    }
+  });
+
 });
 
 let markers = [];
@@ -510,7 +524,9 @@ function viewEvent(event) {
   const modalTitle = document.getElementById("modal-title");
   const modalContent = document.getElementById("modal-content");
   selectedEventId = event._id;
-  selectedEventAttendees = document.getElementById(`attendees-count-${selectedEventId}`).textContent.split(" ")[0];
+  selectedEventAttendees = document
+    .getElementById(`attendees-count-${selectedEventId}`)
+    .textContent.split(" ")[0];
 
   modalTitle.innerHTML = event.name;
   modalContent.innerHTML = `
@@ -538,9 +554,7 @@ function viewEvent(event) {
         event.organizerName
       } - ${event.organizerContact}</p>
       <p id="modal-location" class="modal-info">
-      <i class="material-icons">accessibility</i>${
-        selectedEventAttendees
-      } Going to Attend</p>
+      <i class="material-icons">accessibility</i>${selectedEventAttendees} Going to Attend</p>
       <br>
       <p id="modal-details" class="modal-info">${event.details}</p>
      </div>
@@ -687,12 +701,12 @@ function updateRSVP(id) {
   let value = parseInt(count);
   let isIncreased = false;
 
-  if (rsvpBtn.innerText === 'RSVP') {
-    rsvpBtn.innerText = 'Going';
+  if (rsvpBtn.innerText === "RSVP") {
+    rsvpBtn.innerText = "Going";
     attendeesCount.textContent = `${value + 1} Going`;
     isIncreased = true;
   } else {
-    rsvpBtn.innerText = 'RSVP';
+    rsvpBtn.innerText = "RSVP";
     attendeesCount.textContent = `${value - 1} Going`;
   }
 
@@ -702,7 +716,7 @@ function updateRSVP(id) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ "isIncreased": isIncreased })
+      body: JSON.stringify({ isIncreased: isIncreased }),
     });
   } catch (err) {
     attendeesCount.textContent = `${value} Going`;
@@ -775,7 +789,7 @@ async function saveUpdateCategory(id) {
       M.toast({ html: "This Category already exist", classes: "toast" });
       cell.textContent = oldCategoryValue;
       return;
-    }else{
+    } else {
       await fetch(`/events/categories/${id}`, {
         method: "PUT",
         headers: {
@@ -785,10 +799,9 @@ async function saveUpdateCategory(id) {
           // prettier-ignore
           { "name": newValue }
         ),
-      })
-      .then((response) => {
-        if(response.ok){
-          M.toast({ html: "Category Updated" , classes:"toast"});
+      }).then((response) => {
+        if (response.ok) {
+          M.toast({ html: "Category Updated", classes: "toast" });
           getCategories();
         }
       });

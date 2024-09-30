@@ -133,6 +133,11 @@ router.patch("/events/rsvp/:id", async (req, res) => {
       return res.status(404).json({ message: "Event not found" });
     }
 
+    req.io.emit('rsvpUpdated', {
+      eventId: id,
+      attendees: updatedEvent.attendees
+    });
+
     res.status(200).json(updatedEvent);
   } catch (err) {
     console.error(err);

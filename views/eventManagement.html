@@ -64,7 +64,7 @@
                 <input type="text" id="name" name="name" required>
                 <label for="name">Category Name</label>
             </div>
-            <input type="submit" class="btn cyan accent-3" value="Add"/>
+            <input type="submit" class="btn cyan accent-3" value="Add" />
         </form>
 
         <div class="category-list" id="categoryList">
@@ -201,17 +201,17 @@
             <a href="#!" class="waves-effect waves-light blue btn" id="edit-event-btn">Update</a>
             <a href="" class="waves-effect waves-light red btn" id="delete-event-btn">Delete</a>
             <a id="save-update-btn" class="waves-effect waves-light green btn" style="display:none;">Save</button>
-            <a class="modal-close waves-effect waves-light btn">Back</a>
+                <a class="modal-close waves-effect waves-light btn">Back</a>
         </div>
     </div>
     <div id="overlay" class="overlay"></div>
 
     <script>(g => { var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window; b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams, u = () => h || (h = new Promise(async (f, n) => { await (a = m.createElement("script")); e.set("libraries", [...r] + ""); for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]); e.set("callback", c + ".maps." + q); a.src = `https://maps.${c}apis.com/maps/api/js?` + e; d[q] = f; a.onerror = () => h = n(Error(p + " could not load.")); a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a) })); d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)) })
             ({ key: "AIzaSyDV1mLpG7FgmDa9vyXga5l7uJGfM0Sz-Vc", libraries: "places", v: "weekly" });</script>
-
+    <script type="text/javascript" src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
+        
     </script>
-
 
 </body>
 

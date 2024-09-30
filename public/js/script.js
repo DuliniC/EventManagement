@@ -285,6 +285,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  socket.on('eventDeleted', (eventId) => {
+    const eventCard = document.getElementById(`${eventId}`);
+    eventCard.remove();
+    initMap();
+    getEvents();
+  });
+
+  
 });
 
 let markers = [];
@@ -453,6 +461,7 @@ function setEventCardContainer(events) {
   events.forEach((event) => {
     const card = document.createElement("div");
     card.classList.add("card");
+    card.id = event._id;
 
     card.innerHTML = `
       <div class="card-image">

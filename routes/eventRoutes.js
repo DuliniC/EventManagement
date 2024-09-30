@@ -109,6 +109,7 @@ router.put("/events/:id", async (req, res) => {
 router.delete("/events/:id", async (req, res) => {
   try {
     await Event.findByIdAndDelete(req.params.id);
+    req.io.emit("eventDeleted", req.params.id);
     res.status(200).json({ message: "Delete Event Successfully" });
   } catch (err) {
     res.status(500).send(err);

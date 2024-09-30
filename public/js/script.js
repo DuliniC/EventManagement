@@ -16,7 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var bannerBase64String = "";
 
   var dates = document.querySelectorAll(".datepicker");
-  M.Datepicker.init(dates);
+  M.Datepicker.init(dates, {
+    minDate: new Date(),
+  });
 
   var time = document.querySelectorAll(".timepicker");
   M.Timepicker.init(time);
@@ -35,7 +37,6 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-
   // Open side panel
   addCategoryBtn.addEventListener("click", () => {
     sidePanelC.style.width = "25%";
@@ -43,8 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelC.classList.add("open");
-    document.getElementById('overlay').classList.add('visible');
-    document.querySelector('body').style.overflow = "hidden";
+    document.getElementById("overlay").classList.add("visible");
+    document.querySelector("body").style.overflow = "hidden";
   });
 
   // Close side panel
@@ -58,8 +59,8 @@ document.addEventListener("DOMContentLoaded", function () {
     sidePanelE.style.display = "none";
     sidePanelE.classList.remove("open");
 
-    document.getElementById('overlay').classList.remove('visible');
-    document.querySelector('body').style.overflow = "visible";
+    document.getElementById("overlay").classList.remove("visible");
+    document.querySelector("body").style.overflow = "visible";
     categoryForm.reset();
   });
 
@@ -70,8 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addEventBtn.style.display = "inline-block";
     sidePanelE.classList.remove("open");
 
-    document.querySelector('body').style.overflow = "visible";
-    document.getElementById('overlay').classList.remove('visible');
+    document.querySelector("body").style.overflow = "visible";
+    document.getElementById("overlay").classList.remove("visible");
     eventAddForm.reset();
     imagePreview.src = "";
     bannerBase64String = "";
@@ -84,8 +85,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addCategoryBtn.style.display = "none";
     addEventBtn.style.display = "none";
     sidePanelE.classList.add("open");
-    document.getElementById('overlay').classList.add('visible');
-    document.querySelector('body').style.overflow = "hidden";
+    document.getElementById("overlay").classList.add("visible");
+    document.querySelector("body").style.overflow = "hidden";
     getCategories();
     initMapPlace();
   });
@@ -97,8 +98,8 @@ document.addEventListener("DOMContentLoaded", function () {
     addEventBtn.style.display = "inline-block";
     sidePanelE.classList.remove("open");
 
-    document.getElementById('overlay').classList.remove('visible');
-    document.querySelector('body').style.overflow = "visible";
+    document.getElementById("overlay").classList.remove("visible");
+    document.querySelector("body").style.overflow = "visible";
 
     eventAddForm.reset();
     imagePreview.src = "";
@@ -254,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eventAddForm.reset();
       imagePreview.src = "";
       sidePanelE.classList.remove("open");
-      document.getElementById('overlay').classList.remove('visible');
+      document.getElementById("overlay").classList.remove("visible");
       getEvents();
       setTimeout(() => {
         window.location.reload();
@@ -271,6 +272,89 @@ document.addEventListener("DOMContentLoaded", function () {
         deleteEvent(selectedEventId);
       }
     });
+
+  //Socket.io Scripts
+  var socket = io();
+
+  //Event
+  socket.on("rsvpUpdated", (data) => {
+    const { eventId, attendees } = data;
+
+    const rsvpCountElement = document.getElementById(
+      `attendees-count-${eventId}`
+    );
+    if (rsvpCountElement) {
+      rsvpCountElement.textContent = `${attendees} Going`;
+    }
+  });
+
+  socket.on("eventDeleted", (eventId) => {
+    const eventCard = document.getElementById(`${eventId}`);
+    eventCard.remove();
+  });
+
+  socket.on("eventUpdated", (event) => {
+    const eventCard = document.getElementById(`${event._id}`);
+    eventCard.innerHTML = `
+      <div class="card-image">
+        <img src="data:image/png;base64,${
+          event.banner
+        }" onerror="this.onerror=null; this.src='./img/img-noload.jpg';" alt="Event Image">
+        <span class="card-title">
+          ${new Date(event.date).toDateString()} <br/> 
+          ${event.timeStart} - ${event.timeEnd}
+        </span>
+      </div>
+      <div class="card-content">
+        <span class="card-title">${event.name}</span>
+        <p>${event.details}</p>
+      </div>
+      <div class="card-action">
+        <div class="row">
+          <div class="col s1"><i class="material-icons icon-location">location_on</i></div>
+          <div class="col s5">${event.location?.address}</div>
+          <div class="col s4">
+            <button class="waves-light btn" id="rsvp-btn-${event._id}" 
+                onclick="updateRSVP('${event._id}',${
+      event.attendees
+    })">RSVP</button><br><br>
+            <span id="attendees-count-${event._id}">${
+      event.attendees
+    } Going</span>
+          </div>
+          <div class="col s1">
+          <button class="btn-flat view-event-btn"><i class="material-icons icon-view">visibility</i></button></div>
+        </div>
+      </div>
+    `;
+  });
+
+  //Category
+  socket.on("categoryDeleted", (categoryId) => {
+    const row = document.getElementById(`category-row-${categoryId}`);
+    if (row) {
+      row.remove();
+    }
+
+    const filterCard = document.getElementById(`option-card-${categoryId}`);
+    if (filterCard){
+      filterCard.remove();
+    }
+  });
+
+  socket.on("categoryUpdated", (category) => {
+    const name = document.getElementById(`category-name-${category._id}`);
+    if (name) {
+      name.innerHTML = `${category.name}`;
+    }
+
+    const filterCard = document.getElementById(`option-card-${category._id}`);
+    if (filterCard){
+      filterCard.innerHTML = `<h5>${category.name}</h5>`
+    }
+  });
+
+
 });
 
 let markers = [];
@@ -366,6 +450,7 @@ function showCategoryFilters(categories) {
   categories.forEach((category) => {
     const card = document.createElement("div");
     card.classList.add("option-card", "center-align", "white", "z-depth-1");
+    card.id = `option-card-${category._id}`;
     card.innerHTML = `
     <h5>${category.name}</h5>`;
 
@@ -439,6 +524,7 @@ function setEventCardContainer(events) {
   events.forEach((event) => {
     const card = document.createElement("div");
     card.classList.add("card");
+    card.id = event._id;
 
     card.innerHTML = `
       <div class="card-image">
@@ -510,7 +596,9 @@ function viewEvent(event) {
   const modalTitle = document.getElementById("modal-title");
   const modalContent = document.getElementById("modal-content");
   selectedEventId = event._id;
-  selectedEventAttendees = document.getElementById(`attendees-count-${selectedEventId}`).textContent.split(" ")[0];
+  selectedEventAttendees = document
+    .getElementById(`attendees-count-${selectedEventId}`)
+    .textContent.split(" ")[0];
 
   modalTitle.innerHTML = event.name;
   modalContent.innerHTML = `
@@ -538,9 +626,7 @@ function viewEvent(event) {
         event.organizerName
       } - ${event.organizerContact}</p>
       <p id="modal-location" class="modal-info">
-      <i class="material-icons">accessibility</i>${
-        selectedEventAttendees
-      } Going to Attend</p>
+      <i class="material-icons">accessibility</i>${selectedEventAttendees} Going to Attend</p>
       <br>
       <p id="modal-details" class="modal-info">${event.details}</p>
      </div>
@@ -687,12 +773,12 @@ function updateRSVP(id) {
   let value = parseInt(count);
   let isIncreased = false;
 
-  if (rsvpBtn.innerText === 'RSVP') {
-    rsvpBtn.innerText = 'Going';
+  if (rsvpBtn.innerText === "RSVP") {
+    rsvpBtn.innerText = "Going";
     attendeesCount.textContent = `${value + 1} Going`;
     isIncreased = true;
   } else {
-    rsvpBtn.innerText = 'RSVP';
+    rsvpBtn.innerText = "RSVP";
     attendeesCount.textContent = `${value - 1} Going`;
   }
 
@@ -702,7 +788,7 @@ function updateRSVP(id) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ "isIncreased": isIncreased })
+      body: JSON.stringify({ isIncreased: isIncreased }),
     });
   } catch (err) {
     attendeesCount.textContent = `${value} Going`;
@@ -775,7 +861,7 @@ async function saveUpdateCategory(id) {
       M.toast({ html: "This Category already exist", classes: "toast" });
       cell.textContent = oldCategoryValue;
       return;
-    }else{
+    } else {
       await fetch(`/events/categories/${id}`, {
         method: "PUT",
         headers: {
@@ -785,10 +871,9 @@ async function saveUpdateCategory(id) {
           // prettier-ignore
           { "name": newValue }
         ),
-      })
-      .then((response) => {
-        if(response.ok){
-          M.toast({ html: "Category Updated" , classes:"toast"});
+      }).then((response) => {
+        if (response.ok) {
+          M.toast({ html: "Category Updated", classes: "toast" });
           getCategories();
         }
       });

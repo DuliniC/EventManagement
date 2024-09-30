@@ -86,7 +86,7 @@ router.put("/events/:id", async (req, res) => {
     attendees,
   } = req.body;
   try {
-    await Event.findByIdAndUpdate(req.params.id, {
+    const updatedEvent = await Event.findByIdAndUpdate(req.params.id, {
       name,
       details,
       date,
@@ -98,7 +98,8 @@ router.put("/events/:id", async (req, res) => {
       banner,
       location,
       attendees,
-    });
+    },{ new: true });
+    req.io.emit("eventUpdated", updatedEvent);
     res.status(200).json({ message: "Update Successfully" });
   } catch (err) {
     res.status(500).send(err);
@@ -109,6 +110,7 @@ router.put("/events/:id", async (req, res) => {
 router.delete("/events/:id", async (req, res) => {
   try {
     await Event.findByIdAndDelete(req.params.id);
+    req.io.emit("eventDeleted", req.params.id);
     res.status(200).json({ message: "Delete Event Successfully" });
   } catch (err) {
     res.status(500).send(err);
@@ -132,6 +134,11 @@ router.patch("/events/rsvp/:id", async (req, res) => {
     if (!updatedEvent) {
       return res.status(404).json({ message: "Event not found" });
     }
+
+    req.io.emit('rsvpUpdated', {
+      eventId: id,
+      attendees: updatedEvent.attendees
+    });
 
     res.status(200).json(updatedEvent);
   } catch (err) {

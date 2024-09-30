@@ -25,7 +25,14 @@ app.get("/Events/", (req, res) => {
 
 // Routes
 const categoryRoutes = require("./routes/categoryRoutes");
-app.use("/Events/", categoryRoutes);
+app.use(
+  "/Events/",
+  (req, res, next) => {
+    req.io = io; // Attach `io` to the request object
+    next();
+  },
+  categoryRoutes
+);
 
 const eventRoutes = require("./routes/eventRoutes");
 app.use(

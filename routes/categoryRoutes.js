@@ -46,6 +46,7 @@ router.delete("/categories/:id", async (req, res) => {
       res.status(400).json({message : "This Category cannot be deleted since Associated with events."})
     }else{
       await Category.findByIdAndDelete(id);
+      req.io.emit("categoryDeleted", id);
       res.status(200).json({message : "Category Deleted"})  
     }
   } catch (err) {
@@ -68,7 +69,7 @@ router.put("/categories/:id", async (req, res) => {
     if (!updatedCategory) {
       return res.status(404).json({ message: "Category not found" });
     }
-
+    req.io.emit("categoryUpdated", updatedCategory);
     res.status(200).json(updatedCategory);
   } catch (error) {
     console.error("Error updating category:", error);

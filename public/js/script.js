@@ -16,8 +16,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var bannerBase64String = "";
 
   var dates = document.querySelectorAll(".datepicker");
-  M.Datepicker.init(dates,{
-    minDate : new Date()
+  M.Datepicker.init(dates, {
+    minDate: new Date(),
   });
 
   var time = document.querySelectorAll(".timepicker");
@@ -276,6 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
   //Socket.io Scripts
   var socket = io();
 
+  //Event
   socket.on("rsvpUpdated", (data) => {
     const { eventId, attendees } = data;
 
@@ -327,7 +328,33 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     `;
   });
-  
+
+  //Category
+  socket.on("categoryDeleted", (categoryId) => {
+    const row = document.getElementById(`category-row-${categoryId}`);
+    if (row) {
+      row.remove();
+    }
+
+    const filterCard = document.getElementById(`option-card-${categoryId}`);
+    if (filterCard){
+      filterCard.remove();
+    }
+  });
+
+  socket.on("categoryUpdated", (category) => {
+    const name = document.getElementById(`category-name-${category._id}`);
+    if (name) {
+      name.innerHTML = `${category.name}`;
+    }
+
+    const filterCard = document.getElementById(`option-card-${category._id}`);
+    if (filterCard){
+      filterCard.innerHTML = `<h5>${category.name}</h5>`
+    }
+  });
+
+
 });
 
 let markers = [];
@@ -423,6 +450,7 @@ function showCategoryFilters(categories) {
   categories.forEach((category) => {
     const card = document.createElement("div");
     card.classList.add("option-card", "center-align", "white", "z-depth-1");
+    card.id = `option-card-${category._id}`;
     card.innerHTML = `
     <h5>${category.name}</h5>`;
 
